@@ -13,6 +13,7 @@ const CATEGORIEN = [
   { id: "verlichting", naam: "Verlichting", emoji: "💡" },
   { id: "effecten", naam: "Rook & Bellen", emoji: "🌫️" },
   { id: "accessoires", naam: "Accessoires", emoji: "🔌" },
+  { id: "glow-in-the-dark", naam: "Glow in the Dark", emoji: "🪩" },
 ];
 
 interface PageProps {

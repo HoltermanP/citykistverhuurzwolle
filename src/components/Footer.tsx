@@ -53,6 +53,7 @@ export default function Footer() {
                 { href: "/producten?cat=verlichting", label: "💡 Verlichting" },
                 { href: "/producten?cat=effecten", label: "🌫️ Rook & Bellen" },
                 { href: "/producten?cat=accessoires", label: "🔌 Accessoires" },
+                { href: "/producten?cat=glow-in-the-dark", label: "🪩 Glow in the Dark" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-slate-600 hover:text-party text-sm transition-colors">

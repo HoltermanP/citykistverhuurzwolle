@@ -13,6 +13,7 @@ const CATEGORIE_EMOJI: Record<string, string> = {
   verlichting: "💡",
   effecten: "🌫️",
   accessoires: "🔌",
+  "glow-in-the-dark": "🪩",
 };
 
 const CATEGORIE_GRADIENT: Record<string, string> = {
@@ -22,6 +23,7 @@ const CATEGORIE_GRADIENT: Record<string, string> = {
   verlichting: "from-amber-100 to-amber-200",
   effecten: "from-cyan-100 to-cyan-200",
   accessoires: "from-slate-100 to-slate-200",
+  "glow-in-the-dark": "from-fuchsia-100 to-purple-200",
 };
 
 interface Props {

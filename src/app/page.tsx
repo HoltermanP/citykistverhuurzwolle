@@ -13,6 +13,7 @@ const CATEGORIEN = [
   { id: "verlichting", naam: "Verlichting", emoji: "💡", beschrijving: "Disco, laser en moving head effecten" },
   { id: "effecten", naam: "Rook & Bellen", emoji: "🌫️", beschrijving: "Rook- en bellenblaas machines" },
   { id: "accessoires", naam: "Accessoires", emoji: "🔌", beschrijving: "Laptops, presenters en kabels" },
+  { id: "glow-in-the-dark", naam: "Glow in the Dark", emoji: "🪩", beschrijving: "Neon, blacklight en glow-artikelen" },
 ];
 
 export default async function HomePage() {
@@ -116,7 +117,7 @@ export default async function HomePage() {
             <p className="text-slate-600 mt-3">Kies een categorie om te beginnen</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {CATEGORIEN.map((cat) => (
               <Link
                 key={cat.id}

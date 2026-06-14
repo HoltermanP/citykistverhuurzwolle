@@ -31,6 +31,7 @@ const CATEGORIEN = [
   { id: "verlichting", naam: "💡 Verlichting" },
   { id: "effecten", naam: "🌫️ Rook & Bellen" },
   { id: "accessoires", naam: "🔌 Accessoires" },
+  { id: "glow-in-the-dark", naam: "🪩 Glow in the Dark" },
 ];
 
 function naarSlug(naam: string): string {

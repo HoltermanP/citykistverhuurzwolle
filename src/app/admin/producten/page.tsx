@@ -12,6 +12,7 @@ const CATEGORIE_LABEL: Record<string, string> = {
   verlichting: "💡 Verlichting",
   effecten: "🌫️ Effecten",
   accessoires: "🔌 Accessoires",
+  "glow-in-the-dark": "🪩 Glow in the Dark",
 };
 
 export default async function AdminProductenPage() {
