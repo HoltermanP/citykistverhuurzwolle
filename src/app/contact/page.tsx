@@ -1,6 +1,6 @@
 import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import ContactForm from "@/components/ContactForm";
 
 export default function ContactPage() {
   return (
@@ -92,21 +92,9 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* Contactformulier + FAQ */}
         <div className="space-y-4">
-          <div className="bg-gradient-to-br from-party/10 to-pink-party/5 border border-party/30 rounded-2xl p-8 text-center">
-            <div className="text-5xl mb-4">🎉</div>
-            <h2 className="text-slate-900 font-black text-2xl mb-3">Direct een aanvraag doen?</h2>
-            <p className="text-slate-600 mb-6">
-              Kies jouw producten, vul je gegevens in en wij nemen contact op ter bevestiging.
-            </p>
-            <Link
-              href="/aanvraag"
-              className="block w-full bg-gradient-party hover:opacity-90 text-white py-4 rounded-xl font-bold text-lg transition-opacity"
-            >
-              Aanvraag starten →
-            </Link>
-          </div>
+          <ContactForm />
 
           <div className="bg-dark-card border border-dark-border rounded-2xl p-6">
             <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">

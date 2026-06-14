@@ -103,3 +103,52 @@ export async function sendOrderEmail(order: Order) {
       </div>`,
   });
 }
+
+export type ContactBericht = {
+  naam: string;
+  email: string;
+  telefoon?: string;
+  bericht: string;
+};
+
+export async function sendContactEmail(data: ContactBericht) {
+  const transporter = createTransport();
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+
+  // Bericht naar de beheerder
+  await transporter.sendMail({
+    from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
+    to: adminEmail,
+    replyTo: `"${data.naam}" <${data.email}>`,
+    subject: `Contactformulier: bericht van ${data.naam}`,
+    html: `<div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px">
+      <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
+        <h1 style="color:white;margin:0;font-size:22px">📩 Nieuw bericht via contactformulier</h1>
+      </div>
+      <div style="background:white;padding:20px;border-radius:8px">
+        <p><strong>Naam:</strong> ${data.naam}</p>
+        <p><strong>E-mail:</strong> <a href="mailto:${data.email}">${data.email}</a></p>
+        ${data.telefoon ? `<p><strong>Telefoon:</strong> ${data.telefoon}</p>` : ""}
+        <p><strong>Bericht:</strong></p>
+        <p style="white-space:pre-wrap;background:#f3f4f6;padding:12px;border-radius:6px">${data.bericht}</p>
+      </div>
+      <p style="color:#666;font-size:12px;text-align:center;margin-top:16px">CityKist Verhuur • Zwolle</p>
+    </div>`,
+  });
+
+  // Bevestiging naar de afzender
+  await transporter.sendMail({
+    from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
+    to: data.email,
+    subject: "Bedankt voor je bericht — CityKist Verhuur Zwolle",
+    html: `<div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto">
+      <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
+        <h1 style="color:white;margin:0">Bedankt voor je bericht, ${data.naam}!</h1>
+      </div>
+      <p>We hebben je bericht ontvangen en nemen zo snel mogelijk contact met je op.</p>
+      <p style="background:#f3f4f6;padding:12px;border-radius:6px;white-space:pre-wrap">${data.bericht}</p>
+      <p>Heb je een dringende vraag? Bel ons op <strong>06-226 321 07</strong>.</p>
+      <p style="color:#999;font-size:12px">CityKist Verhuur • Zwolle</p>
+    </div>`,
+  });
+}
