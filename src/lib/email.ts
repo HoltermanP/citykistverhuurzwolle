@@ -70,7 +70,7 @@ function buildOrderHtml(order: Order): string {
           </tfoot>
         </table>
       </div>
-      <p style="color:#666;font-size:12px;text-align:center">CityKist Verhuur • info@citykistverhuur.nl • 06-226 321 07</p>
+      <p style="color:#666;font-size:12px;text-align:center">CityKist Verhuur • info@citykistverhuurzwolle.nl • 06-226 321 07</p>
     </div>`;
 }
 
@@ -98,7 +98,7 @@ export async function sendOrderEmail(order: Order) {
         <p>We hebben je aanvraag ontvangen en nemen zo snel mogelijk contact met je op ter bevestiging.</p>
         <p><strong>Ophalen:</strong> ${formatDate(order.ophaaldatum)}<br>
         <strong>Retour:</strong> ${formatDate(order.retourdatum)}</p>
-        <p>Heb je vragen? Bel ons op <strong>06-226 321 07</strong> of mail naar <a href="mailto:info@citykistverhuur.nl">info@citykistverhuur.nl</a></p>
+        <p>Heb je vragen? Bel ons op <strong>06-226 321 07</strong> of mail naar <a href="mailto:info@citykistverhuurzwolle.nl">info@citykistverhuurzwolle.nl</a></p>
         <p style="color:#999;font-size:12px">CityKist Verhuur • Zwolle</p>
       </div>`,
   });

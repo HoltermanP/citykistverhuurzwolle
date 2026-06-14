@@ -46,13 +46,13 @@ export default function ContactPage() {
                 </div>
               </a>
 
-              <a href="mailto:info@citykistverhuur.nl" className="flex items-start gap-4 group">
+              <a href="mailto:info@citykistverhuurzwolle.nl" className="flex items-start gap-4 group">
                 <div className="w-10 h-10 bg-party/10 rounded-xl flex items-center justify-center flex-shrink-0">
                   <Mail size={18} className="text-party" />
                 </div>
                 <div>
                   <p className="text-slate-500 text-xs uppercase tracking-wide">E-mail</p>
-                  <p className="text-slate-900 font-semibold group-hover:text-party transition-colors break-all">info@citykistverhuur.nl</p>
+                  <p className="text-slate-900 font-semibold group-hover:text-party transition-colors break-all">info@citykistverhuurzwolle.nl</p>
                 </div>
               </a>
 

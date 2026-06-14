@@ -33,7 +33,7 @@ export default function Header() {
               <span className="text-slate-900 font-black text-lg leading-none block">
                 City<span className="text-party">Kist</span>
               </span>
-              <span className="text-slate-500 text-xs leading-none">Feest Verhuur Zwolle</span>
+              <span className="text-slate-500 text-xs leading-none">Citykist Verhuur Zwolle</span>
             </div>
           </Link>
 

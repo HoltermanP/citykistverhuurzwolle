@@ -14,7 +14,7 @@ export default function Footer() {
                 <span className="text-slate-900 font-black text-lg leading-none block">
                   City<span className="text-party">Kist</span>
                 </span>
-                <span className="text-slate-400 text-xs">Feest Verhuur Zwolle</span>
+                <span className="text-slate-400 text-xs">Citykist Verhuur Zwolle</span>
               </div>
             </div>
             <p className="text-slate-600 text-sm leading-relaxed">
@@ -75,8 +75,8 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <Mail size={15} className="text-party-light mt-0.5 flex-shrink-0" />
-                <a href="mailto:info@citykistverhuur.nl" className="text-slate-600 hover:text-party text-sm transition-colors break-all">
-                  info@citykistverhuur.nl
+                <a href="mailto:info@citykistverhuurzwolle.nl" className="text-slate-600 hover:text-party text-sm transition-colors break-all">
+                  info@citykistverhuurzwolle.nl
                 </a>
               </li>
               <li className="flex items-start gap-2">
