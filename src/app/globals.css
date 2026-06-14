@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --party: #0891B2;
+  --party-light: #22D3EE;
+  --pink: #84CC16;
+  --cyan: #06B6D4;
+  --oranje: #FF6B00;
+  --marine: #003580;
+  --dark: #080C14;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F4F5F8;
+  color: #1E293B;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #E4E7EC; }
+::-webkit-scrollbar-thumb { background: #0891B2; border-radius: 3px; }
+
+input[type="date"] { color-scheme: light; }
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Party glow effects */
+.glow-party {
+  box-shadow: 0 0 20px rgba(8, 145, 178, 0.3);
+}
+.glow-party:hover {
+  box-shadow: 0 0 30px rgba(8, 145, 178, 0.5);
+}
+.glow-pink {
+  box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);
+}
