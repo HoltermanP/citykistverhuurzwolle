@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { Order, OrderItem } from "./schema";
+import { metBtw } from "./btw";
 
 function createTransport() {
   return nodemailer.createTransport({
@@ -20,6 +21,8 @@ function formatDate(dateStr: string) {
 
 function buildOrderHtml(order: Order): string {
   const items = (order.items as OrderItem[]) || [];
+  // Opbouw incl. BTW reconstrueren uit de regelbedragen (die zijn excl. BTW).
+  const inclBtw = metBtw(items.reduce((s, i) => s + i.subtotaal, 0));
   const itemsHtml = items
     .map(
       (i) => `
@@ -32,6 +35,11 @@ function buildOrderHtml(order: Order): string {
     )
     .join("");
 
+  const betaalRegel =
+    order.betaalmethode === "ideal"
+      ? `iDEAL — ${order.betaalstatus === "betaald" ? "✅ betaald" : order.betaalstatus === "mislukt" ? "❌ mislukt" : "⏳ wacht op betaling"}`
+      : "Contant bij ophalen";
+
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px">
       <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
@@ -43,6 +51,7 @@ function buildOrderHtml(order: Order): string {
         <p><strong>E-mail:</strong> ${order.email}</p>
         <p><strong>Telefoon:</strong> ${order.telefoon}</p>
         <p><strong>Adres:</strong> ${order.adres}, ${order.postcode} ${order.stad}</p>
+        <p><strong>Betaling:</strong> ${betaalRegel}</p>
       </div>
       <div style="background:white;padding:20px;border-radius:8px;margin-bottom:16px">
         <h2 style="color:#333;margin-top:0">Huurdatums</h2>
@@ -64,8 +73,16 @@ function buildOrderHtml(order: Order): string {
           <tbody>${itemsHtml}</tbody>
           <tfoot>
             <tr>
-              <td colspan="3" style="padding:12px;text-align:right;font-weight:bold">Totaal (excl. BTW):</td>
-              <td style="padding:12px;text-align:right;font-weight:bold;font-size:18px;color:#0891B2">€${Number(order.totaal).toFixed(2)}</td>
+              <td colspan="3" style="padding:8px 12px;text-align:right;color:#555">Subtotaal (excl. BTW):</td>
+              <td style="padding:8px 12px;text-align:right;color:#555">€${inclBtw.excl.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding:8px 12px;text-align:right;color:#555">BTW 21%:</td>
+              <td style="padding:8px 12px;text-align:right;color:#555">€${inclBtw.btw.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colspan="3" style="padding:12px;text-align:right;font-weight:bold">Totaal (incl. BTW):</td>
+              <td style="padding:12px;text-align:right;font-weight:bold;font-size:18px;color:#0891B2">€${inclBtw.incl.toFixed(2)}</td>
             </tr>
           </tfoot>
         </table>
@@ -96,6 +113,11 @@ export async function sendOrderEmail(order: Order) {
           <h1 style="color:white;margin:0">Bedankt voor je aanvraag, ${order.naam}!</h1>
         </div>
         <p>We hebben je aanvraag ontvangen en nemen zo snel mogelijk contact met je op ter bevestiging.</p>
+        ${
+          order.betaalmethode === "ideal" && order.betaalstatus === "betaald"
+            ? `<p style="background:#ecfdf5;color:#065f46;padding:12px;border-radius:6px"><strong>✅ Betaling ontvangen:</strong> €${Number(order.totaal).toFixed(2)} via iDEAL.</p>`
+            : `<p style="background:#f3f4f6;padding:12px;border-radius:6px"><strong>Betaling:</strong> contant bij het ophalen (€${Number(order.totaal).toFixed(2)}).</p>`
+        }
         <p><strong>Ophalen:</strong> ${formatDate(order.ophaaldatum)}<br>
         <strong>Retour:</strong> ${formatDate(order.retourdatum)}</p>
         <p>Heb je vragen? Bel ons op <strong>06-226 321 07</strong> of mail naar <a href="mailto:info@citykistverhuurzwolle.nl">info@citykistverhuurzwolle.nl</a></p>

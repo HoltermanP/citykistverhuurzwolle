@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { CheckCircle, ShoppingCart, Trash2, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { metBtw } from "@/lib/btw";
+import { CheckCircle, ShoppingCart, Trash2, ArrowLeft, Loader2, AlertCircle, Banknote, Wallet } from "lucide-react";
 import Link from "next/link";
 
 function formatDate(dateStr: string) {
@@ -16,6 +17,7 @@ export default function AanvraagPage() {
     adres: "", postcode: "", stad: "",
     notities: "",
   });
+  const [betaalmethode, setBetaalmethode] = useState<"ideal" | "contant">("ideal");
   const [succes, setSucces] = useState(false);
   const [error, setError] = useState("");
   const [laden, setLaden] = useState(false);
@@ -57,23 +59,34 @@ export default function AanvraagPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          betaalmethode,
           ophaaldatum: startDatums[0],
           retourdatum: eindDatums[eindDatums.length - 1],
           items,
-          totaal: totaalPrijs,
+          totaal: metBtw(totaalPrijs).incl,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Er is iets misgegaan. Probeer opnieuw.");
-      } else {
-        setSucces(true);
-        leegMaken();
+        setLaden(false);
+        return;
       }
+
+      if (data.checkoutUrl) {
+        // iDEAL: stuur de klant door naar de Mollie-betaalpagina.
+        leegMaken();
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
+      // Contant: direct bevestiging tonen.
+      setSucces(true);
+      leegMaken();
+      setLaden(false);
     } catch {
       setError("Verbindingsfout. Controleer je internet en probeer opnieuw.");
-    } finally {
       setLaden(false);
     }
   }
@@ -200,6 +213,38 @@ export default function AanvraagPage() {
             </div>
           </div>
 
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-6 space-y-3">
+            <h2 className="text-slate-900 font-bold text-lg">Betaalwijze</h2>
+            <button
+              type="button"
+              onClick={() => setBetaalmethode("ideal")}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl border transition-colors ${
+                betaalmethode === "ideal" ? "border-party bg-party/5" : "border-dark-border hover:border-party/50"
+              }`}
+            >
+              <Wallet className={betaalmethode === "ideal" ? "text-party" : "text-slate-400"} size={22} />
+              <span className="flex-1">
+                <span className="block text-slate-900 font-semibold">iDEAL — direct online betalen</span>
+                <span className="block text-slate-500 text-sm">Veilig afrekenen via je eigen bank.</span>
+              </span>
+              <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ${betaalmethode === "ideal" ? "border-party bg-party" : "border-slate-300"}`} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setBetaalmethode("contant")}
+              className={`w-full flex items-center gap-3 text-left p-4 rounded-xl border transition-colors ${
+                betaalmethode === "contant" ? "border-party bg-party/5" : "border-dark-border hover:border-party/50"
+              }`}
+            >
+              <Banknote className={betaalmethode === "contant" ? "text-party" : "text-slate-400"} size={22} />
+              <span className="flex-1">
+                <span className="block text-slate-900 font-semibold">Contant bij het ophalen</span>
+                <span className="block text-slate-500 text-sm">Betaal ter plaatse wanneer je de spullen ophaalt.</span>
+              </span>
+              <span className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ${betaalmethode === "contant" ? "border-party bg-party" : "border-slate-300"}`} />
+            </button>
+          </div>
+
           {error && (
             <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-4">
               <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
@@ -214,12 +259,16 @@ export default function AanvraagPage() {
           >
             {laden ? (
               <><Loader2 className="animate-spin" size={20} /> Verzenden...</>
+            ) : betaalmethode === "ideal" ? (
+              "Betalen met iDEAL →"
             ) : (
               "Aanvraag versturen →"
             )}
           </button>
           <p className="text-slate-400 text-xs text-center">
-            Geen online betaling vereist. Betaling achteraf na bevestiging.
+            {betaalmethode === "ideal"
+              ? "Je betaalt direct online via iDEAL. We nemen daarna contact op ter bevestiging."
+              : "Je betaalt contant bij het ophalen. We nemen contact op ter bevestiging."}
           </p>
         </form>
 
@@ -267,12 +316,20 @@ export default function AanvraagPage() {
                   })}
                 </div>
 
-                <div className="border-t border-dark-border pt-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-slate-600">Totaal (excl. BTW)</span>
-                    <span className="text-slate-900 font-black text-2xl">€{totaalPrijs.toFixed(2)}</span>
+                <div className="border-t border-dark-border pt-4 space-y-1.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">Subtotaal (excl. BTW)</span>
+                    <span className="text-slate-700">€{metBtw(totaalPrijs).excl.toFixed(2)}</span>
                   </div>
-                  <p className="text-slate-400 text-xs">Definitief bedrag na bevestiging</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600">BTW 21%</span>
+                    <span className="text-slate-700">€{metBtw(totaalPrijs).btw.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-2 border-t border-dark-border">
+                    <span className="text-slate-900 font-semibold">Totaal (incl. BTW)</span>
+                    <span className="text-slate-900 font-black text-2xl">€{metBtw(totaalPrijs).incl.toFixed(2)}</span>
+                  </div>
+                  <p className="text-slate-400 text-xs pt-1">Definitief bedrag na bevestiging</p>
                 </div>
               </>
             )}

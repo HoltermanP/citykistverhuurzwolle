@@ -17,6 +17,18 @@ const STATUS_KLEUR: Record<string, string> = {
   geannuleerd: "bg-red-100 text-red-700",
 };
 
+function betaalBadge(order: { betaalmethode: string | null; betaalstatus: string | null }) {
+  if (order.betaalmethode === "ideal") {
+    const map: Record<string, { label: string; cls: string }> = {
+      betaald: { label: "iDEAL · betaald", cls: "bg-green-100 text-green-700" },
+      open: { label: "iDEAL · wacht op betaling", cls: "bg-amber-100 text-amber-700" },
+      mislukt: { label: "iDEAL · mislukt", cls: "bg-red-100 text-red-700" },
+    };
+    return map[order.betaalstatus || "open"] || map.open;
+  }
+  return { label: "Contant bij ophalen", cls: "bg-slate-100 text-slate-600" };
+}
+
 export default async function BestellingenPage() {
   let allOrders: typeof orders.$inferSelect[] = [];
   try {
@@ -54,8 +66,12 @@ export default async function BestellingenPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-slate-500 text-xs">{formatDate(order.createdAt)}</span>
+                    {(() => {
+                      const b = betaalBadge(order);
+                      return <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${b.cls}`}>{b.label}</span>;
+                    })()}
                     <OrderStatusSelect id={order.id} status={order.status || "nieuw"} />
-                    <span className="text-party font-bold">€{Number(order.totaal).toFixed(2)}</span>
+                    <span className="text-party font-bold">€{Number(order.totaal).toFixed(2)} <span className="text-slate-400 font-normal text-xs">incl. BTW</span></span>
                   </div>
                 </div>
 
