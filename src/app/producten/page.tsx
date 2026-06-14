@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { db } from "@/lib/db";
 import { products } from "@/lib/schema";
 import { eq, asc } from "drizzle-orm";
@@ -49,17 +50,31 @@ export default async function ProductenPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-      <div className="mb-8">
-        <h1 className="text-slate-900 font-black text-3xl md:text-4xl">
-          Alle <span className="text-transparent bg-clip-text bg-gradient-party">Producten</span>
-        </h1>
-        <p className="text-slate-600 mt-2">
-          {allProducts.length > 0 ? `${allProducts.length} artikelen beschikbaar` : "Laden..."} — dagprijzen excl. BTW
-        </p>
-      </div>
+    <>
+      {/* ── HEADER ─────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        <Image
+          src="/images/sfeer/stage.jpg"
+          alt="Podiumverlichting"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-party-dark/90 via-party-dark/75 to-pink-party/45" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-20">
+          <span className="inline-block text-cyan-300 font-bold text-sm uppercase tracking-wider mb-2 [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">Assortiment</span>
+          <h1 className="text-white font-black text-3xl md:text-5xl [text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+            Alle <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-lime-300">Producten</span>
+          </h1>
+          <p className="text-white/90 mt-3 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+            {allProducts.length > 0 ? `${allProducts.length} artikelen beschikbaar` : "Laden..."} — dagprijzen excl. BTW
+          </p>
+        </div>
+      </section>
 
-      <ProductenFilter categorien={CATEGORIEN} actief={actieveCat} zoek={zoek} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <ProductenFilter categorien={CATEGORIEN} actief={actieveCat} zoek={zoek} />
 
       {allProducts.length === 0 ? (
         <div className="text-center py-20">
@@ -84,6 +99,7 @@ export default async function ProductenPage({ searchParams }: PageProps) {
             return (
               <div key={cat.id}>
                 <div className="flex items-center gap-3 mb-5 pb-3 border-b border-dark-border">
+                  <span className="w-1.5 h-7 rounded-full bg-gradient-party" />
                   <span className="text-2xl">{cat.emoji}</span>
                   <h2 className="text-slate-900 font-black text-xl">{cat.naam}</h2>
                   <span className="text-slate-400 text-sm">({items.length})</span>
@@ -104,6 +120,7 @@ export default async function ProductenPage({ searchParams }: PageProps) {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

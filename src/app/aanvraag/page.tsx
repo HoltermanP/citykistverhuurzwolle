@@ -104,10 +104,11 @@ export default function AanvraagPage() {
           <ArrowLeft size={16} />
           Terug naar producten
         </Link>
-        <h1 className="text-slate-900 font-black text-3xl">
+        <span className="inline-block text-party font-bold text-sm uppercase tracking-wider mb-1">Bijna klaar</span>
+        <h1 className="text-slate-900 font-black text-3xl md:text-4xl">
           Aanvraag <span className="text-transparent bg-clip-text bg-gradient-party">indienen</span>
         </h1>
-        <p className="text-slate-600 mt-1">Vul je gegevens in en wij nemen contact op ter bevestiging.</p>
+        <p className="text-slate-600 mt-2">Vul je gegevens in en wij nemen contact op ter bevestiging.</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">

@@ -1,19 +1,33 @@
 import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function ContactPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-slate-900 font-black text-3xl md:text-4xl mb-3">
-          <span className="text-transparent bg-clip-text bg-gradient-party">Contact</span>
-        </h1>
-        <p className="text-slate-600 text-lg">
-          Vragen? We zijn 7 dagen per week bereikbaar.
-        </p>
-      </div>
+    <>
+      {/* ── HEADER ─────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        <Image
+          src="/images/sfeer/lights.jpg"
+          alt="Sfeerverlichting"
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-party-dark/90 via-party-dark/75 to-pink-party/45" />
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-16 md:py-20 text-center">
+          <span className="inline-block text-cyan-300 font-bold text-sm uppercase tracking-wider mb-2 [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">Neem contact op</span>
+          <h1 className="text-white font-black text-3xl md:text-5xl [text-shadow:0_2px_14px_rgba(0,0,0,0.45)]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-lime-300">Contact</span>
+          </h1>
+          <p className="text-white/90 text-lg mt-3 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
+            Vragen? We zijn 7 dagen per week bereikbaar.
+          </p>
+        </div>
+      </section>
 
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
       <div className="grid md:grid-cols-2 gap-8">
         {/* Contactgegevens */}
         <div className="space-y-4">
@@ -115,6 +129,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

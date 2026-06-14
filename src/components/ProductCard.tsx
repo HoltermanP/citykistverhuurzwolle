@@ -57,7 +57,7 @@ export default function ProductCard({ product, compact = false }: Props) {
   const heeftAfbeelding = !!product.afbeeldingUrl && !imgError;
 
   return (
-    <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-party/40 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg group flex flex-col">
+    <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-party/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-party/10 group flex flex-col">
       {/* Visual */}
       <div className={`relative h-40 flex items-center justify-center bg-gradient-to-br ${gradient}`}>
         {heeftAfbeelding ? (
@@ -172,10 +172,10 @@ export default function ProductCard({ product, compact = false }: Props) {
 
           <button
             onClick={handleToevoegen}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm ${
               toegevoegd
                 ? "bg-green-600 text-white"
-                : "bg-party hover:bg-party-dark text-white"
+                : "bg-gradient-party hover:opacity-90 text-white"
             }`}
           >
             {toegevoegd ? <>✓ Toegevoegd</> : <><Plus size={13} />Toevoegen</>}
