@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { products } from "@/lib/schema";
 import { asc } from "drizzle-orm";
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
-import ProductToggle from "./ProductToggle";
+import { Plus } from "lucide-react";
+import ProductRow from "./ProductRow";
 
 const CATEGORIE_LABEL: Record<string, string> = {
   beamer: "📽️ Beamers",
@@ -62,36 +62,9 @@ export default async function AdminProductenPage() {
               <h2 className="text-slate-500 text-sm font-bold uppercase tracking-wide mb-3">
                 {CATEGORIE_LABEL[cat] || cat} ({items.length})
               </h2>
-              <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
-                {items.map((p, i) => (
-                  <div
-                    key={p.id}
-                    className={`flex items-center gap-4 px-5 py-3.5 ${i !== items.length - 1 ? "border-b border-dark-border" : ""}`}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-900 text-sm font-medium truncate">{p.naam}</span>
-                        {p.populair && (
-                          <span className="text-xs bg-party/10 text-party px-1.5 py-0.5 rounded-full">Populair</span>
-                        )}
-                        {p.isKoop && (
-                          <span className="text-xs bg-cyan-100 text-cyan-700 px-1.5 py-0.5 rounded-full">Koop</span>
-                        )}
-                      </div>
-                      <p className="text-slate-500 text-xs mt-0.5 truncate">{p.beschrijving}</p>
-                    </div>
-                    <div className="text-party font-bold text-sm flex-shrink-0">
-                      €{Number(p.prijsPerDag).toFixed(2)}
-                      <span className="text-slate-400 font-normal">{p.isKoop ? "" : "/dag"}</span>
-                    </div>
-                    <ProductToggle id={p.id} beschikbaar={p.beschikbaar ?? true} />
-                    <Link
-                      href={`/admin/producten/${p.id}`}
-                      className="flex-shrink-0 w-8 h-8 bg-slate-50 hover:bg-slate-100 border border-dark-border rounded-lg flex items-center justify-center transition-colors"
-                    >
-                      <Pencil size={14} className="text-slate-500" />
-                    </Link>
-                  </div>
+              <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden divide-y divide-dark-border">
+                {items.map((p) => (
+                  <ProductRow key={p.id} product={p} />
                 ))}
               </div>
             </div>

@@ -304,9 +304,9 @@ export default function ProductForm({ initieel, mode }: Props) {
                 <button
                   type="button"
                   onClick={() => updateForm(field as keyof ProductFormData, !form[field as keyof ProductFormData] as any)}
-                  className={`w-10 h-6 rounded-full transition-colors relative ${form[field as keyof ProductFormData] ? "bg-green-500" : "bg-slate-300"}`}
+                  className={`flex-shrink-0 inline-flex items-center w-11 h-6 px-0.5 rounded-full transition-colors ${form[field as keyof ProductFormData] ? "bg-green-500" : "bg-slate-300"}`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form[field as keyof ProductFormData] ? "translate-x-4" : "translate-x-0.5"}`} />
+                  <span className={`w-5 h-5 rounded-full bg-white shadow transform transition-transform ${form[field as keyof ProductFormData] ? "translate-x-5" : "translate-x-0"}`} />
                 </button>
               </label>
             ))}

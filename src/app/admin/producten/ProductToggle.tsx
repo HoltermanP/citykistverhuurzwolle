@@ -31,9 +31,9 @@ export default function ProductToggle({ id, beschikbaar }: Props) {
     <button
       onClick={toggle}
       disabled={laden}
-      className={`flex-shrink-0 w-10 h-6 rounded-full transition-colors relative ${actief ? "bg-green-500" : "bg-slate-300"}`}
+      className={`flex-shrink-0 inline-flex items-center w-11 h-6 px-0.5 rounded-full transition-colors ${actief ? "bg-green-500" : "bg-slate-300"}`}
     >
-      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${actief ? "translate-x-4" : "translate-x-0.5"}`} />
+      <span className={`w-5 h-5 rounded-full bg-white shadow transform transition-transform ${actief ? "translate-x-5" : "translate-x-0"}`} />
     </button>
   );
 }
