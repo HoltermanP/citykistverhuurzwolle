@@ -87,13 +87,13 @@ export default async function HomePage() {
             <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-white/10">
               {[
                 { getal: "7 dagen", label: "Per week bereikbaar" },
-                { getal: "6 cat.", label: "Productcategorieën" },
-                { getal: "€0", label: "Online betaling" },
-                { getal: "Zwolle", label: "& omgeving" },
+                { getal: "10+ jaar", label: "Tevreden klanten" },
+                { getal: "100%", label: "Geteste apparatuur" },
+                { getal: "Zwolle e.o.", label: "Bezorging mogelijk" },
               ].map((s) => (
                 <div key={s.label}>
-                  <div className="text-2xl font-black text-party-light">{s.getal}</div>
-                  <div className="text-white/50 text-sm">{s.label}</div>
+                  <div className="text-2xl font-black text-cyan-300 [text-shadow:0_1px_8px_rgba(0,0,0,0.4)]">{s.getal}</div>
+                  <div className="text-white/80 text-sm [text-shadow:0_1px_6px_rgba(0,0,0,0.5)]">{s.label}</div>
                 </div>
               ))}
             </div>
