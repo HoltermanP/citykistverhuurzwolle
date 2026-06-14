@@ -1,6 +1,30 @@
 import nodemailer from "nodemailer";
-import { Order, OrderItem } from "./schema";
+import { Order, OrderItem, orders } from "./schema";
 import { metBtw } from "./btw";
+import { genereerFactuurPdf, factuurnummerVoor } from "./factuur";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+
+// Genereert (indien nodig) de PDF-factuur, slaat 'm op bij de bestelling en
+// geeft het factuurnummer + de PDF-bytes terug om als bijlage mee te sturen.
+async function zorgVoorFactuur(order: Order): Promise<{ factuurnummer: string; pdf: Buffer }> {
+  const factuurnummer = factuurnummerVoor(order);
+
+  // Hergebruik een eerder opgeslagen factuur (bv. bij opnieuw versturen).
+  if (order.factuurnummer && order.factuurPdf) {
+    return { factuurnummer: order.factuurnummer, pdf: Buffer.from(order.factuurPdf, "base64") };
+  }
+
+  const pdfBytes = await genereerFactuurPdf({ ...order, factuurnummer });
+  const pdf = Buffer.from(pdfBytes);
+
+  await db
+    .update(orders)
+    .set({ factuurnummer, factuurPdf: pdf.toString("base64") })
+    .where(eq(orders.id, order.id));
+
+  return { factuurnummer, pdf };
+}
 
 function createTransport() {
   return nodemailer.createTransport({
@@ -95,18 +119,28 @@ export async function sendOrderEmail(order: Order) {
   const transporter = createTransport();
   const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
 
+  // Factuur genereren + opslaan bij de bestelling en als bijlage meesturen.
+  const { factuurnummer, pdf } = await zorgVoorFactuur(order);
+  const bijlage = {
+    filename: `factuur-${factuurnummer}.pdf`,
+    content: pdf,
+    contentType: "application/pdf",
+  };
+
   await transporter.sendMail({
     from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
     to: adminEmail,
-    subject: `Nieuwe bestelling van ${order.naam} — CityKist`,
+    subject: `Nieuwe bestelling van ${order.naam} — CityKist (${factuurnummer})`,
     html: buildOrderHtml(order),
+    attachments: [bijlage],
   });
 
-  // Bevestiging naar klant
+  // Bevestiging + factuur naar klant
   await transporter.sendMail({
     from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
     to: order.email,
-    subject: "Bedankt voor je aanvraag — CityKist Verhuur",
+    subject: `Je factuur ${factuurnummer} — CityKist Verhuur`,
+    attachments: [bijlage],
     html: `
       <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
@@ -120,6 +154,7 @@ export async function sendOrderEmail(order: Order) {
         }
         <p><strong>Ophalen:</strong> ${formatDate(order.ophaaldatum)}<br>
         <strong>Retour:</strong> ${formatDate(order.retourdatum)}</p>
+        <p>📎 Je vindt de factuur (<strong>${factuurnummer}</strong>) als bijlage bij deze e-mail.</p>
         <p>Heb je vragen? Bel ons op <strong>06-226 321 07</strong> of mail naar <a href="mailto:info@citykistverhuurzwolle.nl">info@citykistverhuurzwolle.nl</a></p>
         <p style="color:#999;font-size:12px">CityKist Verhuur • Zwolle</p>
       </div>`,

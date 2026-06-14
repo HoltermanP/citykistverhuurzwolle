@@ -32,6 +32,8 @@ export const orders = pgTable("orders", {
   betaalmethode: text("betaalmethode").default("contant"),
   betaalstatus: text("betaalstatus").default("n.v.t."),
   molliePaymentId: text("mollie_payment_id").default(""),
+  factuurnummer: text("factuurnummer").default(""),
+  factuurPdf: text("factuur_pdf").default(""),
   totaal: numeric("totaal", { precision: 10, scale: 2 }),
   items: jsonb("items").$type<OrderItem[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),

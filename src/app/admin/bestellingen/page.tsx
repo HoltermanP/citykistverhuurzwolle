@@ -3,6 +3,7 @@ import { orders } from "@/lib/schema";
 import { desc } from "drizzle-orm";
 import { OrderItem } from "@/lib/schema";
 import OrderStatusSelect from "./OrderStatusSelect";
+import { FileText } from "lucide-react";
 
 function formatDate(d: Date | null) {
   if (!d) return "-";
@@ -72,6 +73,15 @@ export default async function BestellingenPage() {
                     })()}
                     <OrderStatusSelect id={order.id} status={order.status || "nieuw"} />
                     <span className="text-party font-bold">€{Number(order.totaal).toFixed(2)} <span className="text-slate-400 font-normal text-xs">incl. BTW</span></span>
+                    <a
+                      href={`/api/admin/orders/${order.id}/factuur`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Factuur (PDF) bekijken"
+                      className="flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-party border border-dark-border rounded-lg px-2.5 py-1.5 transition-colors"
+                    >
+                      <FileText size={14} /> Factuur
+                    </a>
                   </div>
                 </div>
 
