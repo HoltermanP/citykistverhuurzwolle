@@ -1,21 +1,46 @@
 import { db } from "@/lib/db";
 import { products, orders } from "@/lib/schema";
-import { count, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { Package, ShoppingBag, TrendingUp, Plus } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+type RecenteBestelling = {
+  id: number;
+  naam: string;
+  email: string;
+  status: string | null;
+  totaal: string | null;
+  createdAt: Date | null;
+};
+
 export default async function AdminDashboard() {
   let stats = { producten: 0, bestellingen: 0, nieuweBestellingen: 0 };
-  let recenteBestellingen: typeof orders.$inferSelect[] = [];
+  let recenteBestellingen: RecenteBestelling[] = [];
+  let dbError: string | null = null;
 
   try {
     const [{ value: aantalProducten }] = await db.select({ value: count() }).from(products);
     const [{ value: aantalBestellingen }] = await db.select({ value: count() }).from(orders);
     const [{ value: nieuw }] = await db.select({ value: count() }).from(orders).where(eq(orders.status, "nieuw"));
-    recenteBestellingen = await db.query.orders.findMany({ orderBy: (o, { desc }) => [desc(o.createdAt)], limit: 5 });
+    recenteBestellingen = await db
+      .select({
+        id: orders.id,
+        naam: orders.naam,
+        email: orders.email,
+        status: orders.status,
+        totaal: orders.totaal,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
+      .orderBy(desc(orders.createdAt))
+      .limit(5);
     stats = { producten: Number(aantalProducten), bestellingen: Number(aantalBestellingen), nieuweBestellingen: Number(nieuw) };
-  } catch {
-    // DB niet geconfigureerd
+  } catch (err) {
+    dbError = err instanceof Error ? err.message : String(err);
+    console.error("[admin/dashboard] DB query mislukt:", err);
   }
 
   return (
@@ -24,6 +49,13 @@ export default async function AdminDashboard() {
         <h1 className="text-slate-900 font-black text-2xl">Dashboard</h1>
         <p className="text-slate-500 text-sm mt-1">Overzicht van jouw verhuurplatform</p>
       </div>
+
+      {dbError && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm">
+          <p className="font-semibold mb-1">Gegevens konden niet worden geladen</p>
+          <p className="text-red-600/80 font-mono text-xs break-all">{dbError}</p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">

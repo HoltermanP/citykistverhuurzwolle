@@ -5,6 +5,9 @@ import { OrderItem } from "@/lib/schema";
 import OrderStatusSelect from "./OrderStatusSelect";
 import { FileText } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function formatDate(d: Date | null) {
   if (!d) return "-";
   return new Date(d).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
@@ -30,12 +33,40 @@ function betaalBadge(order: { betaalmethode: string | null; betaalstatus: string
   return { label: "Contant bij ophalen", cls: "bg-slate-100 text-slate-600" };
 }
 
+type BestellingRij = Omit<typeof orders.$inferSelect, "factuurPdf">;
+
 export default async function BestellingenPage() {
-  let allOrders: typeof orders.$inferSelect[] = [];
+  let allOrders: BestellingRij[] = [];
+  let dbError: string | null = null;
   try {
-    allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
-  } catch {
-    // DB niet geconfigureerd
+    // Laad expliciet zonder de zware base64 PDF-kolom (kan groeien tot honderden KB per rij
+    // en zorgt anders voor trage of falende queries via de Neon HTTP-driver).
+    allOrders = await db
+      .select({
+        id: orders.id,
+        naam: orders.naam,
+        email: orders.email,
+        telefoon: orders.telefoon,
+        adres: orders.adres,
+        postcode: orders.postcode,
+        stad: orders.stad,
+        ophaaldatum: orders.ophaaldatum,
+        retourdatum: orders.retourdatum,
+        notities: orders.notities,
+        status: orders.status,
+        betaalmethode: orders.betaalmethode,
+        betaalstatus: orders.betaalstatus,
+        molliePaymentId: orders.molliePaymentId,
+        factuurnummer: orders.factuurnummer,
+        totaal: orders.totaal,
+        items: orders.items,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
+      .orderBy(desc(orders.createdAt));
+  } catch (err) {
+    dbError = err instanceof Error ? err.message : String(err);
+    console.error("[admin/bestellingen] DB query mislukt:", err);
   }
 
   return (
@@ -45,10 +76,17 @@ export default async function BestellingenPage() {
         <p className="text-slate-500 text-sm mt-1">{allOrders.length} totaal</p>
       </div>
 
+      {dbError && (
+        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-4 text-sm">
+          <p className="font-semibold mb-1">Bestellingen konden niet worden geladen</p>
+          <p className="text-red-600/80 font-mono text-xs break-all">{dbError}</p>
+        </div>
+      )}
+
       {allOrders.length === 0 ? (
         <div className="text-center py-20 bg-dark-card border border-dark-border rounded-2xl">
           <div className="text-5xl mb-4">📋</div>
-          <p className="text-slate-600">Nog geen bestellingen ontvangen</p>
+          <p className="text-slate-600">{dbError ? "Geen bestellingen geladen door een fout hierboven" : "Nog geen bestellingen ontvangen"}</p>
         </div>
       ) : (
         <div className="space-y-4">

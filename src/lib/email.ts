@@ -27,10 +27,16 @@ async function zorgVoorFactuur(order: Order): Promise<{ factuurnummer: string; p
 }
 
 function createTransport() {
+  const port = Number(process.env.SMTP_PORT) || 587;
+  // Poort 465 gebruikt impliciete TLS (SMTPS); 587/25 doen STARTTLS.
+  // SMTP_SECURE kan dit expliciet overschrijven ("true"/"false").
+  const secureEnv = process.env.SMTP_SECURE?.toLowerCase();
+  const secure = secureEnv === "true" ? true : secureEnv === "false" ? false : port === 465;
+
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
+    port,
+    secure,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
