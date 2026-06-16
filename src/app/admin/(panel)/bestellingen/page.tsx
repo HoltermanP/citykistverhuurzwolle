@@ -3,6 +3,7 @@ import { orders } from "@/lib/schema";
 import { desc } from "drizzle-orm";
 import { OrderItem } from "@/lib/schema";
 import OrderStatusSelect from "./OrderStatusSelect";
+import DeleteOrderButton from "./DeleteOrderButton";
 import { FileText } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -120,6 +121,7 @@ export default async function BestellingenPage() {
                     >
                       <FileText size={14} /> Factuur
                     </a>
+                    <DeleteOrderButton id={order.id} naam={order.naam} />
                   </div>
                 </div>
 
