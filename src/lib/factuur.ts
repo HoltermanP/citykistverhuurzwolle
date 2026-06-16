@@ -212,9 +212,9 @@ export async function genereerFactuurPdf(order: Order): Promise<Uint8Array> {
       { size: 9, color: DONKER }
     );
   } else {
-    tekst("Nog te voldoen — contant bij ophalen", vakX + 14, y, { size: 11, font: bold, color: AMBER });
+    tekst("Nog te voldoen - contant of via een tikkie bij ophalen", vakX + 14, y, { size: 11, font: bold, color: AMBER });
     tekst(
-      `Gelieve ${euro(totalen.incl)} contant te voldoen bij het ophalen van de materialen.`,
+      `Gelieve ${euro(totalen.incl)} contant of via een Tikkie te voldoen bij het ophalen van de materialen.`,
       vakX + 14,
       y - 16,
       { size: 9, color: DONKER }
