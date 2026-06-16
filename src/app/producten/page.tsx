@@ -27,11 +27,13 @@ export default async function ProductenPage({ searchParams }: PageProps) {
 
   let allProducts: (typeof products.$inferSelect)[] = [];
   try {
+    // Binnen elke categorie op prijs sorteren (laag → hoog). Bij gelijke prijs
+    // op naam als secundaire sleutel zodat de volgorde stabiel blijft.
     allProducts = await db
       .select()
       .from(products)
       .where(eq(products.beschikbaar, true))
-      .orderBy(asc(products.volgorde), asc(products.naam));
+      .orderBy(asc(products.prijsPerDag), asc(products.naam));
   } catch {
     // DB nog niet geconfigureerd
   }
