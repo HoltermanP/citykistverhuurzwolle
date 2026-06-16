@@ -1,6 +1,19 @@
+import type { Metadata } from "next";
 import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Neem contact op met CityKist Verhuur in Zwolle. Bel 06-226 321 07 of mail naar info@citykistverhuurzwolle.nl. 7 dagen per week bereikbaar.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact — CityKist Verhuur Zwolle",
+    description: "Bel 06-226 321 07 of mail ons. 7 dagen bereikbaar.",
+    url: "/contact",
+  },
+};
 
 export default function ContactPage() {
   return (

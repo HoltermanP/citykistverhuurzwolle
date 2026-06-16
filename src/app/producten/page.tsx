@@ -1,9 +1,23 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { db } from "@/lib/db";
 import { products } from "@/lib/schema";
 import { eq, asc } from "drizzle-orm";
 import ProductCard from "@/components/ProductCard";
 import ProductenFilter from "@/components/ProductenFilter";
+
+export const metadata: Metadata = {
+  title: "Alle producten",
+  description:
+    "Bekijk het volledige assortiment verhuur van CityKist Zwolle: beamers, geluid, karaoke, verlichting, rookmachines, glow-in-the-dark en accessoires. Dagprijzen excl. BTW.",
+  alternates: { canonical: "/producten" },
+  openGraph: {
+    title: "Alle producten — CityKist Verhuur Zwolle",
+    description:
+      "Het volledige assortiment: beamers, geluid, karaoke, verlichting en meer.",
+    url: "/producten",
+  },
+};
 
 const CATEGORIEN = [
   { id: "alle", naam: "Alle producten", emoji: "✨" },

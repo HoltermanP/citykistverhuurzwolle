@@ -1,9 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { products } from "@/lib/schema";
 import { eq, asc } from "drizzle-orm";
 import ProductCard from "@/components/ProductCard";
 import { Phone } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "WK voetbal verhuur",
+  description:
+    "WK voetbal kijken op groot scherm? Huur voordelig je beamer en speakers bij CityKist Zwolle. Compleet pakket voor thuis, kantoor of vereniging.",
+  alternates: { canonical: "/wk-verhuur" },
+  openGraph: {
+    title: "WK voetbal verhuur — CityKist Zwolle",
+    description:
+      "Beamers en geluid voor het WK. Huur voordelig bij CityKist Verhuur in Zwolle.",
+    url: "/wk-verhuur",
+  },
+};
 
 const NL_WEDSTRIJDEN = [
   { datum: "13 juni 2026", label: "Groepsfase 1", tegenstander: "Groepsfase wedstrijd" },

@@ -1,10 +1,17 @@
 export const dynamic = "force-dynamic";
+import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 import { syncOrderPayment } from "@/lib/payments";
 import { CheckCircle, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Betaalstatus",
+  description: "Status van je betaling bij CityKist Verhuur.",
+  robots: { index: false, follow: false },
+};
 
 export default async function BetaaldPage({
   searchParams,
