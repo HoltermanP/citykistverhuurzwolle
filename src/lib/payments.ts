@@ -52,8 +52,14 @@ export async function syncOrderPayment(order: Order): Promise<string> {
       .where(and(eq(orders.id, order.id), ne(orders.betaalstatus, "betaald")))
       .returning();
     // Alleen mailen wanneer wij de status nu daadwerkelijk op betaald zetten.
+    // We awaiten bewust: in een serverless-runtime wordt de functie anders
+    // afgebroken vóór de mail is verstuurd (fire-and-forget gaat verloren).
     if (bijgewerkt) {
-      sendOrderEmail(bijgewerkt).catch((err) => console.error("Mail error:", err));
+      try {
+        await sendOrderEmail(bijgewerkt);
+      } catch (err) {
+        console.error("[syncOrderPayment] mail mislukt:", err);
+      }
     }
   } else {
     await db.update(orders).set({ betaalstatus: nieuweStatus }).where(eq(orders.id, order.id));

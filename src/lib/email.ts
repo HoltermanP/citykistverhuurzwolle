@@ -133,21 +133,10 @@ export async function sendOrderEmail(order: Order) {
     contentType: "application/pdf",
   };
 
-  await transporter.sendMail({
-    from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
-    to: adminEmail,
-    subject: `Nieuwe bestelling van ${order.naam} — CityKist (${factuurnummer})`,
-    html: buildOrderHtml(order),
-    attachments: [bijlage],
-  });
-
-  // Bevestiging + factuur naar klant
-  await transporter.sendMail({
-    from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
-    to: order.email,
-    subject: `Je factuur ${factuurnummer} — CityKist Verhuur`,
-    attachments: [bijlage],
-    html: `
+  // Beide mails parallel sturen om de totale doorlooptijd te halveren
+  // (in serverless tellen seconden — een seriële SMTP-handshake kost al snel
+  // meerdere seconden per mail).
+  const klantHtml = `
       <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto">
         <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
           <h1 style="color:white;margin:0">Bedankt voor je aanvraag, ${order.naam}!</h1>
@@ -163,8 +152,24 @@ export async function sendOrderEmail(order: Order) {
         <p>📎 Je vindt de factuur (<strong>${factuurnummer}</strong>) als bijlage bij deze e-mail.</p>
         <p>Heb je vragen? Bel ons op <strong>06-226 321 07</strong> of mail naar <a href="mailto:info@citykistverhuurzwolle.nl">info@citykistverhuurzwolle.nl</a></p>
         <p style="color:#999;font-size:12px">CityKist Verhuur • Zwolle</p>
-      </div>`,
-  });
+      </div>`;
+
+  await Promise.all([
+    transporter.sendMail({
+      from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
+      to: adminEmail,
+      subject: `Nieuwe bestelling van ${order.naam} — CityKist (${factuurnummer})`,
+      html: buildOrderHtml(order),
+      attachments: [bijlage],
+    }),
+    transporter.sendMail({
+      from: `"CityKist Verhuur" <${process.env.SMTP_USER}>`,
+      to: order.email,
+      subject: `Je factuur ${factuurnummer} — CityKist Verhuur`,
+      html: klantHtml,
+      attachments: [bijlage],
+    }),
+  ]);
 }
 
 export type ContactBericht = {

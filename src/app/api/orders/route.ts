@@ -98,10 +98,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, orderId: order.id, checkoutUrl });
     }
 
-    // Contant bij ophalen: direct bevestigingsmail sturen (fire and forget).
-    sendOrderEmail(order).catch((err) => console.error("Mail error:", err));
+    // Contant bij ophalen: direct bevestigingsmail sturen. We awaiten bewust,
+    // want in een serverless-runtime (Vercel) wordt de functie afgebroken zodra
+    // de response is verzonden. Een mail-fout mag de bestelling niet laten
+    // mislukken — de order staat al in de DB.
+    let mailVerzonden = true;
+    try {
+      await sendOrderEmail(order);
+    } catch (err) {
+      mailVerzonden = false;
+      console.error("[orders POST] mail mislukt:", err);
+    }
 
-    return NextResponse.json({ success: true, orderId: order.id });
+    return NextResponse.json({ success: true, orderId: order.id, mailVerzonden });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Validatie mislukt", details: err.issues }, { status: 400 });
