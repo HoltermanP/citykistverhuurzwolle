@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LayoutDashboard, Package, ShoppingBag, ArrowLeft } from "lucide-react";
+import LogoutButton from "./LogoutButton";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -29,11 +30,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
         </nav>
 
-        <div className="p-3 border-t border-dark-border">
+        <div className="p-3 border-t border-dark-border space-y-1">
           <Link href="/" className="flex items-center gap-2 text-slate-500 hover:text-party text-xs px-3 py-2 transition-colors">
             <ArrowLeft size={14} />
             Naar website
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 
