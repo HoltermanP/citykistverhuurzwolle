@@ -8,6 +8,7 @@ import { z } from "zod";
 const updateSchema = z.object({
   naam: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
+  artikelnummer: z.string().optional(),
   categorie: z.string().min(1).optional(),
   beschrijving: z.string().optional(),
   kenmerken: z.array(z.string()).optional(),

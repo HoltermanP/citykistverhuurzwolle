@@ -139,6 +139,10 @@ export default function ProductCard({ product, compact = false }: Props) {
           {product.naam}
         </h3>
 
+        {product.artikelnummer && (
+          <p className="text-slate-400 text-xs mb-1">Artikelnr. {product.artikelnummer}</p>
+        )}
+
         {!compact && product.beschrijving && (
           <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 mb-2">
             {product.beschrijving}

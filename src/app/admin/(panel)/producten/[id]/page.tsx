@@ -26,6 +26,7 @@ export default async function BewerkProductPage({ params }: Props) {
           id: product.id,
           naam: product.naam,
           slug: product.slug,
+          artikelnummer: product.artikelnummer || "",
           categorie: product.categorie,
           beschrijving: product.beschrijving || "",
           kenmerken: (product.kenmerken as string[]) || [],

@@ -8,6 +8,7 @@ import { Plus, Trash2, Loader2, Save, Upload, X, ImageIcon } from "lucide-react"
 interface ProductFormData {
   naam: string;
   slug: string;
+  artikelnummer: string;
   categorie: string;
   beschrijving: string;
   kenmerken: string[];
@@ -57,6 +58,7 @@ export default function ProductForm({ initieel, mode }: Props) {
   const [form, setForm] = useState<ProductFormData>({
     naam: initieel?.naam || "",
     slug: initieel?.slug || "",
+    artikelnummer: initieel?.artikelnummer || "",
     categorie: initieel?.categorie || "beamer",
     beschrijving: initieel?.beschrijving || "",
     kenmerken: initieel?.kenmerken || [],
@@ -196,6 +198,14 @@ export default function ProductForm({ initieel, mode }: Props) {
               <input required value={form.slug} onChange={(e) => updateForm("slug", e.target.value)}
                 className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party font-mono" />
               <p className="text-slate-400 text-xs mt-1">Wordt gebruikt als bestandsnaam voor de foto</p>
+            </div>
+
+            <div>
+              <label className="text-slate-600 text-sm block mb-1">Artikelnummer</label>
+              <input value={form.artikelnummer} onChange={(e) => updateForm("artikelnummer", e.target.value)}
+                placeholder="bijv. 82"
+                className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
+              <p className="text-slate-400 text-xs mt-1">Wordt op de productpagina getoond als &quot;Artikelnr.&quot;</p>
             </div>
 
             <div>

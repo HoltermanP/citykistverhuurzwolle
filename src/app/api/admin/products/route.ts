@@ -17,6 +17,7 @@ export async function GET() {
 const productSchema = z.object({
   naam: z.string().min(1),
   slug: z.string().min(1),
+  artikelnummer: z.string().optional().default(""),
   categorie: z.string().min(1),
   beschrijving: z.string().optional().default(""),
   kenmerken: z.array(z.string()).optional().default([]),

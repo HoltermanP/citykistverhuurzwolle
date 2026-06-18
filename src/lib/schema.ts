@@ -4,6 +4,7 @@ export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   naam: text("naam").notNull(),
   slug: text("slug").notNull().unique(),
+  artikelnummer: text("artikelnummer").default(""),
   categorie: text("categorie").notNull(),
   beschrijving: text("beschrijving").default(""),
   kenmerken: jsonb("kenmerken").$type<string[]>().default([]),
