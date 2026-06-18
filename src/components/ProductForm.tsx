@@ -16,7 +16,7 @@ interface ProductFormData {
   beschikbaar: boolean;
   populair: boolean;
   volgorde: number;
-  afbeeldingUrl: string;
+  afbeeldingen: string[];
 }
 
 interface Props {
@@ -65,7 +65,7 @@ export default function ProductForm({ initieel, mode }: Props) {
     beschikbaar: initieel?.beschikbaar ?? true,
     populair: initieel?.populair || false,
     volgorde: initieel?.volgorde || 0,
-    afbeeldingUrl: initieel?.afbeeldingUrl || "",
+    afbeeldingen: initieel?.afbeeldingen || [],
   });
   const [nieuwKenmerk, setNieuwKenmerk] = useState("");
 
@@ -87,39 +87,56 @@ export default function ProductForm({ initieel, mode }: Props) {
     updateForm("kenmerken", form.kenmerken.filter((_, idx) => idx !== i));
   }
 
-  async function handleUpload(file: File) {
+  async function handleUpload(files: FileList | File[]) {
     if (!form.slug) {
-      setUploadError("Vul eerst de slug in voor je een foto uploadt.");
+      setUploadError("Vul eerst de slug in voor je foto's uploadt.");
       return;
     }
+    const lijst = Array.from(files);
+    if (lijst.length === 0) return;
+
     setUploadLaden(true);
     setUploadError("");
 
     const fd = new FormData();
-    fd.append("file", file);
+    lijst.forEach((f) => fd.append("files", f));
     fd.append("slug", form.slug);
 
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const data = await res.json();
-
-    if (!res.ok) {
-      setUploadError(data.error || "Upload mislukt");
-    } else {
-      // Voeg cache-buster toe zodat een nieuwe upload direct zichtbaar is
-      updateForm("afbeeldingUrl", data.url + "?t=" + Date.now());
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Upload mislukt");
+      } else {
+        const nieuwe: string[] = data.urls || (data.url ? [data.url] : []);
+        setForm((prev) => ({ ...prev, afbeeldingen: [...prev.afbeeldingen, ...nieuwe] }));
+      }
+    } catch {
+      setUploadError("Verbindingsfout bij het uploaden.");
     }
     setUploadLaden(false);
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) handleUpload(file);
+    if (e.target.files?.length) handleUpload(e.target.files);
+    e.target.value = ""; // reset zodat dezelfde foto opnieuw gekozen kan worden
   }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) handleUpload(file);
+    if (e.dataTransfer.files?.length) handleUpload(e.dataTransfer.files);
+  }
+
+  function verwijderAfbeelding(i: number) {
+    setForm((prev) => ({ ...prev, afbeeldingen: prev.afbeeldingen.filter((_, idx) => idx !== i) }));
+  }
+
+  function maakHoofdfoto(i: number) {
+    setForm((prev) => {
+      const arr = [...prev.afbeeldingen];
+      const [gekozen] = arr.splice(i, 1);
+      return { ...prev, afbeeldingen: [gekozen, ...arr] };
+    });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -134,7 +151,7 @@ export default function ProductForm({ initieel, mode }: Props) {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, afbeeldingUrl: form.afbeeldingen[0] || "" }),
       });
 
       if (!res.ok) {
@@ -212,77 +229,83 @@ export default function ProductForm({ initieel, mode }: Props) {
             </div>
           </div>
 
-          {/* Foto upload */}
+          {/* Foto's upload */}
           <div className="bg-dark-card border border-dark-border rounded-2xl p-5">
             <h3 className="text-slate-900 font-semibold mb-3 flex items-center gap-2">
               <ImageIcon size={16} className="text-party" />
-              Productfoto
+              Productfoto&apos;s
+              {form.afbeeldingen.length > 0 && (
+                <span className="text-slate-400 text-sm font-normal">({form.afbeeldingen.length})</span>
+              )}
             </h3>
 
-            {/* Preview */}
-            {form.afbeeldingUrl ? (
-              <div className="relative mb-3 rounded-xl overflow-hidden bg-dark border border-dark-border h-48 flex items-center justify-center group">
-                <Image
-                  src={form.afbeeldingUrl}
-                  alt="Preview"
-                  fill
-                  className="object-contain p-3"
-                  unoptimized
-                />
-                <button
-                  type="button"
-                  onClick={() => updateForm("afbeeldingUrl", "")}
-                  className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ) : (
-              <div
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                onClick={() => fileRef.current?.click()}
-                className="border-2 border-dashed border-dark-border hover:border-party/50 rounded-xl h-36 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors mb-3 group"
-              >
-                {uploadLaden ? (
-                  <Loader2 size={24} className="text-party animate-spin" />
-                ) : (
-                  <>
-                    <Upload size={24} className="text-slate-400 group-hover:text-party transition-colors" />
-                    <p className="text-slate-500 text-sm text-center">
-                      Sleep een foto hierheen<br />
-                      <span className="text-xs">of klik om te bladeren</span>
-                    </p>
-                  </>
-                )}
+            {/* Preview-grid */}
+            {form.afbeeldingen.length > 0 && (
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {form.afbeeldingen.map((url, i) => (
+                  <div
+                    key={url}
+                    className="relative rounded-xl overflow-hidden bg-dark border border-dark-border aspect-square flex items-center justify-center group"
+                  >
+                    <Image src={url} alt={`Foto ${i + 1}`} fill className="object-contain p-2" unoptimized />
+                    {i === 0 ? (
+                      <span className="absolute top-1 left-1 bg-party text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                        Hoofdfoto
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => maakHoofdfoto(i)}
+                        title="Als hoofdfoto instellen"
+                        className="absolute top-1 left-1 bg-white/90 hover:bg-white text-slate-700 text-[10px] font-semibold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        Hoofdfoto
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => verwijderAfbeelding(i)}
+                      title="Verwijderen"
+                      className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-500 text-white rounded-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
+
+            {/* Dropzone (altijd zichtbaar om bij te uploaden) */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onClick={() => fileRef.current?.click()}
+              className="border-2 border-dashed border-dark-border hover:border-party/50 rounded-xl h-28 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors group"
+            >
+              {uploadLaden ? (
+                <Loader2 size={22} className="text-party animate-spin" />
+              ) : (
+                <>
+                  <Upload size={22} className="text-slate-400 group-hover:text-party transition-colors" />
+                  <p className="text-slate-500 text-sm text-center">
+                    Sleep foto&apos;s hierheen<br />
+                    <span className="text-xs">of klik om te bladeren (meerdere mogelijk)</span>
+                  </p>
+                </>
+              )}
+            </div>
 
             <input
               ref={fileRef}
               type="file"
               accept="image/jpeg,image/png,image/gif,image/webp"
+              multiple
               onChange={handleFileChange}
               className="hidden"
             />
 
-            {/* Vervang foto knop als er al een is */}
-            {form.afbeeldingUrl && (
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploadLaden}
-                className="w-full flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 border border-dark-border text-slate-600 hover:text-party px-4 py-2 rounded-xl text-sm transition-colors"
-              >
-                {uploadLaden ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                {uploadLaden ? "Uploaden..." : "Andere foto kiezen"}
-              </button>
-            )}
-
-            {uploadError && (
-              <p className="text-red-500 text-xs mt-2">{uploadError}</p>
-            )}
-            <p className="text-slate-400 text-xs mt-2">JPG, PNG, GIF of WebP — max. 5MB</p>
+            {uploadError && <p className="text-red-500 text-xs mt-2">{uploadError}</p>}
+            <p className="text-slate-400 text-xs mt-2">JPG, PNG, GIF of WebP — max. 5MB per foto. De eerste foto is de hoofdfoto.</p>
           </div>
         </div>
 

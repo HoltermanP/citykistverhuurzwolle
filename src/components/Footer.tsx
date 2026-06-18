@@ -32,6 +32,7 @@ export default function Footer() {
                 { href: "/wk-verhuur", label: "WK 2026 Verhuur" },
                 { href: "/aanvraag", label: "Aanvraag indienen" },
                 { href: "/contact", label: "Contact" },
+                { href: "/algemene-voorwaarden", label: "Algemene voorwaarden" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-slate-600 hover:text-party text-sm transition-colors">

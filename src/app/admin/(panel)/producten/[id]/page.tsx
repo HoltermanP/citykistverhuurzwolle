@@ -34,7 +34,12 @@ export default async function BewerkProductPage({ params }: Props) {
           beschikbaar: product.beschikbaar ?? true,
           populair: product.populair ?? false,
           volgorde: product.volgorde ?? 0,
-          afbeeldingUrl: product.afbeeldingUrl || "",
+          afbeeldingen:
+            (product.afbeeldingen as string[])?.length
+              ? (product.afbeeldingen as string[])
+              : product.afbeeldingUrl
+                ? [product.afbeeldingUrl]
+                : [],
         }}
       />
     </div>

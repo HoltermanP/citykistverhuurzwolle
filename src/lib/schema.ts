@@ -12,6 +12,7 @@ export const products = pgTable("products", {
   beschikbaar: boolean("beschikbaar").default(true),
   populair: boolean("populair").default(false),
   afbeeldingUrl: text("afbeelding_url").default(""),
+  afbeeldingen: jsonb("afbeeldingen").$type<string[]>().default([]),
   volgorde: integer("volgorde").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

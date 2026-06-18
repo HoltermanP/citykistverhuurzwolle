@@ -2,7 +2,9 @@
 const nextConfig = {
   serverExternalPackages: ["nodemailer"],
   images: {
-    domains: [],
+    remotePatterns: [
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+    ],
   },
 };
 

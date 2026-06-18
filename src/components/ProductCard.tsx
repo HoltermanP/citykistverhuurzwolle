@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Product } from "@/lib/schema";
 
@@ -36,6 +36,7 @@ export default function ProductCard({ product, compact = false }: Props) {
   const [toegevoegd, setToeGevoegd] = useState(false);
   const [showKenmerken, setShowKenmerken] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [imgIndex, setImgIndex] = useState(0);
 
   const [startDatum, setStartDatum] = useState(new Date().toISOString().split("T")[0]);
   const [eindDatum, setEindDatum] = useState(new Date(Date.now() + 86400000).toISOString().split("T")[0]);
@@ -56,7 +57,18 @@ export default function ProductCard({ product, compact = false }: Props) {
   const emoji = CATEGORIE_EMOJI[product.categorie] || "📦";
   const gradient = CATEGORIE_GRADIENT[product.categorie] || "from-slate-100 to-slate-200";
   const kenmerken = (product.kenmerken as string[]) || [];
-  const heeftAfbeelding = !!product.afbeeldingUrl && !imgError;
+  // Gebruik de fotogalerij; val terug op de losse coverfoto voor oude producten.
+  const afbeeldingen = (product.afbeeldingen as string[])?.length
+    ? (product.afbeeldingen as string[])
+    : product.afbeeldingUrl
+      ? [product.afbeeldingUrl]
+      : [];
+  const heeftAfbeelding = afbeeldingen.length > 0 && !imgError;
+  const huidigeIndex = Math.min(imgIndex, afbeeldingen.length - 1);
+  const toon = (i: number) => {
+    setImgError(false);
+    setImgIndex((i + afbeeldingen.length) % afbeeldingen.length);
+  };
 
   return (
     <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden hover:border-party/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-party/10 group flex flex-col">
@@ -64,7 +76,8 @@ export default function ProductCard({ product, compact = false }: Props) {
       <div className={`relative h-40 flex items-center justify-center bg-gradient-to-br ${gradient}`}>
         {heeftAfbeelding ? (
           <Image
-            src={product.afbeeldingUrl!}
+            key={afbeeldingen[huidigeIndex]}
+            src={afbeeldingen[huidigeIndex]}
             alt={product.naam}
             fill
             className="object-contain p-3"
@@ -74,6 +87,40 @@ export default function ProductCard({ product, compact = false }: Props) {
         ) : (
           <span className="text-5xl">{emoji}</span>
         )}
+
+        {/* Carousel-bediening bij meerdere foto's */}
+        {heeftAfbeelding && afbeeldingen.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Vorige foto"
+              onClick={() => toon(huidigeIndex - 1)}
+              className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-700 rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              aria-label="Volgende foto"
+              onClick={() => toon(huidigeIndex + 1)}
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-slate-700 rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <ChevronRight size={16} />
+            </button>
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1">
+              {afbeeldingen.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`Foto ${i + 1}`}
+                  onClick={() => toon(i)}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors ${i === huidigeIndex ? "bg-party" : "bg-white/70 hover:bg-white"}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         {product.populair && (
           <span className="absolute top-2 right-2 bg-gradient-party text-white text-xs font-bold px-2 py-0.5 rounded-full z-10">
             Populair

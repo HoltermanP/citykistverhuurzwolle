@@ -1,35 +1,53 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 
 const ALLOWED = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 const MAX_MB = 5;
 
 export async function POST(req: Request) {
   try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        { error: "Opslag niet geconfigureerd (BLOB_READ_WRITE_TOKEN ontbreekt)." },
+        { status: 500 }
+      );
+    }
+
     const formData = await req.formData();
-    const file = formData.get("file") as File | null;
     const slug = (formData.get("slug") as string | null)?.trim();
+    // Ondersteun zowel meerdere ("files") als één ("file") bestand.
+    const files = [
+      ...formData.getAll("files"),
+      ...formData.getAll("file"),
+    ].filter((f): f is File => f instanceof File);
 
-    if (!file) return NextResponse.json({ error: "Geen bestand" }, { status: 400 });
+    if (files.length === 0) return NextResponse.json({ error: "Geen bestand" }, { status: 400 });
     if (!slug) return NextResponse.json({ error: "Geen slug opgegeven" }, { status: 400 });
-    if (!ALLOWED.includes(file.type)) {
-      return NextResponse.json({ error: "Alleen JPG, PNG, GIF of WebP toegestaan" }, { status: 400 });
+
+    for (const file of files) {
+      if (!ALLOWED.includes(file.type)) {
+        return NextResponse.json({ error: "Alleen JPG, PNG, GIF of WebP toegestaan" }, { status: 400 });
+      }
+      if (file.size > MAX_MB * 1024 * 1024) {
+        return NextResponse.json({ error: `Elk bestand mag maximaal ${MAX_MB}MB zijn` }, { status: 400 });
+      }
     }
-    if (file.size > MAX_MB * 1024 * 1024) {
-      return NextResponse.json({ error: `Bestand mag maximaal ${MAX_MB}MB zijn` }, { status: 400 });
-    }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const filename = `${slug}.${ext}`;
-    const dir = path.join(process.cwd(), "public", "images", "producten");
-    await mkdir(dir, { recursive: true });
+    const urls = await Promise.all(
+      files.map(async (file) => {
+        const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+        const blob = await put(`producten/${slug}.${ext}`, file, {
+          access: "public",
+          addRandomSuffix: true, // uniek per upload — meerdere foto's per product
+          contentType: file.type,
+        });
+        return blob.url;
+      })
+    );
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(dir, filename), buffer);
-
-    return NextResponse.json({ url: `/images/producten/${filename}` });
+    // 'url' voor enkele upload (achterwaarts compatibel), 'urls' voor meerdere.
+    return NextResponse.json({ urls, url: urls[0] });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Upload mislukt" }, { status: 500 });

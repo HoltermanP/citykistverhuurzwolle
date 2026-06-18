@@ -26,13 +26,16 @@ const productSchema = z.object({
   populair: z.boolean().optional().default(false),
   volgorde: z.number().optional().default(0),
   afbeeldingUrl: z.string().optional().default(""),
+  afbeeldingen: z.array(z.string()).optional().default([]),
 });
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const data = productSchema.parse(body);
-    const [product] = await db.insert(products).values(data).returning();
+    // De eerste foto is de cover (afbeeldingUrl) — voor kaarten en externe API.
+    const cover = data.afbeeldingen[0] || data.afbeeldingUrl || "";
+    const [product] = await db.insert(products).values({ ...data, afbeeldingUrl: cover }).returning();
     return NextResponse.json(product, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {

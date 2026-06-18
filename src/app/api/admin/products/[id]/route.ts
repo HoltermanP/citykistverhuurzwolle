@@ -17,6 +17,7 @@ const updateSchema = z.object({
   populair: z.boolean().optional(),
   volgorde: z.number().optional(),
   afbeeldingUrl: z.string().optional(),
+  afbeeldingen: z.array(z.string()).optional(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -24,9 +25,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const body = await req.json();
     const data = updateSchema.parse(body);
+    // Houd de cover (afbeeldingUrl) in sync met de eerste foto.
+    const patch =
+      data.afbeeldingen !== undefined
+        ? { ...data, afbeeldingUrl: data.afbeeldingen[0] || "" }
+        : data;
     const [updated] = await db
       .update(products)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...patch, updatedAt: new Date() })
       .where(eq(products.id, Number(id)))
       .returning();
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
