@@ -13,6 +13,7 @@ export default function Header() {
     { href: "/", label: "Home" },
     { href: "/producten", label: "Producten" },
     { href: "/wk-verhuur", label: "WK 2026 ⚽" },
+    { href: "/service", label: "Service" },
     { href: "/contact", label: "Contact" },
   ];
 

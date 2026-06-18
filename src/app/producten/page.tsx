@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { db } from "@/lib/db";
-import { products } from "@/lib/schema";
-import { eq, asc } from "drizzle-orm";
+import { products, handleidingen, Handleiding } from "@/lib/schema";
+import { eq, asc, isNotNull } from "drizzle-orm";
 import ProductCard from "@/components/ProductCard";
 import ProductenFilter from "@/components/ProductenFilter";
 
@@ -50,6 +50,21 @@ export default async function ProductenPage({ searchParams }: PageProps) {
       .orderBy(asc(products.prijsPerDag), asc(products.naam));
   } catch {
     // DB nog niet geconfigureerd
+  }
+
+  // Aan producten gekoppelde handleidingen ophalen en per productId groeperen.
+  const handleidingenPerProduct: Record<number, Handleiding[]> = {};
+  try {
+    const gekoppeld = await db
+      .select()
+      .from(handleidingen)
+      .where(isNotNull(handleidingen.productId))
+      .orderBy(asc(handleidingen.volgorde));
+    for (const h of gekoppeld) {
+      if (h.productId != null) (handleidingenPerProduct[h.productId] ||= []).push(h);
+    }
+  } catch {
+    // geen handleidingen
   }
 
   const gefilterd = allProducts.filter((p) => {
@@ -123,7 +138,7 @@ export default async function ProductenPage({ searchParams }: PageProps) {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {items.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard key={product.id} product={product} handleidingen={handleidingenPerProduct[product.id] || []} />
                   ))}
                 </div>
               </div>
@@ -133,7 +148,7 @@ export default async function ProductenPage({ searchParams }: PageProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {gefilterd.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} handleidingen={handleidingenPerProduct[product.id] || []} />
           ))}
         </div>
       )}

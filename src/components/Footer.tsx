@@ -31,6 +31,7 @@ export default function Footer() {
                 { href: "/producten", label: "Alle producten" },
                 { href: "/wk-verhuur", label: "WK 2026 Verhuur" },
                 { href: "/aanvraag", label: "Aanvraag indienen" },
+                { href: "/service", label: "Service & handleidingen" },
                 { href: "/contact", label: "Contact" },
                 { href: "/algemene-voorwaarden", label: "Algemene voorwaarden" },
               ].map((link) => (

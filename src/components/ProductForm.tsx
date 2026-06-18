@@ -18,6 +18,7 @@ interface ProductFormData {
   populair: boolean;
   volgorde: number;
   afbeeldingen: string[];
+  videoUrl: string;
 }
 
 interface Props {
@@ -68,6 +69,7 @@ export default function ProductForm({ initieel, mode }: Props) {
     populair: initieel?.populair || false,
     volgorde: initieel?.volgorde || 0,
     afbeeldingen: initieel?.afbeeldingen || [],
+    videoUrl: initieel?.videoUrl || "",
   });
   const [nieuwKenmerk, setNieuwKenmerk] = useState("");
 
@@ -230,6 +232,14 @@ export default function ProductForm({ initieel, mode }: Props) {
               <label className="text-slate-600 text-sm block mb-1">Beschrijving</label>
               <textarea value={form.beschrijving} onChange={(e) => updateForm("beschrijving", e.target.value)}
                 rows={3} className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party resize-none" />
+            </div>
+
+            <div>
+              <label className="text-slate-600 text-sm block mb-1">Video (optioneel)</label>
+              <input value={form.videoUrl} onChange={(e) => updateForm("videoUrl", e.target.value)}
+                placeholder="https://youtube.com/..."
+                className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
+              <p className="text-slate-400 text-xs mt-1">Link naar een video; wordt als &quot;Bekijk video&quot; bij het product getoond</p>
             </div>
 
             <div>

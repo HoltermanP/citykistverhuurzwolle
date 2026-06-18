@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, FileText, PlayCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { Product } from "@/lib/schema";
+import { Product, Handleiding } from "@/lib/schema";
 
 const CATEGORIE_EMOJI: Record<string, string> = {
   beamer: "📽️",
@@ -29,9 +29,10 @@ const CATEGORIE_GRADIENT: Record<string, string> = {
 interface Props {
   product: Product;
   compact?: boolean;
+  handleidingen?: Handleiding[];
 }
 
-export default function ProductCard({ product, compact = false }: Props) {
+export default function ProductCard({ product, compact = false, handleidingen = [] }: Props) {
   const { voegToe, openCart } = useCart();
   const [toegevoegd, setToeGevoegd] = useState(false);
   const [showKenmerken, setShowKenmerken] = useState(false);
@@ -168,6 +169,35 @@ export default function ProductCard({ product, compact = false }: Props) {
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+        )}
+
+        {/* Handleidingen & video gekoppeld aan dit product */}
+        {!compact && (handleidingen.length > 0 || product.videoUrl) && (
+          <div className="mb-3 space-y-1.5">
+            {product.videoUrl && (
+              <a
+                href={product.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-slate-600 hover:text-party text-xs transition-colors"
+              >
+                <PlayCircle size={13} className="text-party" /> Bekijk video
+              </a>
+            )}
+            {handleidingen.map((h) =>
+              h.bestandUrl ? (
+                <a
+                  key={h.id}
+                  href={h.bestandUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-slate-600 hover:text-party text-xs transition-colors"
+                >
+                  <FileText size={13} className="text-party" /> {h.titel}
+                </a>
+              ) : null
             )}
           </div>
         )}

@@ -28,6 +28,7 @@ const productSchema = z.object({
   volgorde: z.number().optional().default(0),
   afbeeldingUrl: z.string().optional().default(""),
   afbeeldingen: z.array(z.string()).optional().default([]),
+  videoUrl: z.string().optional().default(""),
 });
 
 export async function POST(req: Request) {

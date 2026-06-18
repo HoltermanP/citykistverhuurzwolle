@@ -14,6 +14,7 @@ export const products = pgTable("products", {
   populair: boolean("populair").default(false),
   afbeeldingUrl: text("afbeelding_url").default(""),
   afbeeldingen: jsonb("afbeeldingen").$type<string[]>().default([]),
+  videoUrl: text("video_url").default(""),
   volgorde: integer("volgorde").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -40,6 +41,21 @@ export const orders = pgTable("orders", {
   items: jsonb("items").$type<OrderItem[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const handleidingen = pgTable("handleidingen", {
+  id: serial("id").primaryKey(),
+  titel: text("titel").notNull(),
+  beschrijving: text("beschrijving").default(""),
+  categorie: text("categorie").default("Algemeen"),
+  bestandUrl: text("bestand_url").default(""),
+  // Optionele koppeling aan een product — dan wordt de handleiding ook bij dat artikel getoond.
+  productId: integer("product_id"),
+  volgorde: integer("volgorde").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Handleiding = typeof handleidingen.$inferSelect;
+export type NewHandleiding = typeof handleidingen.$inferInsert;
 
 export type OrderItem = {
   productId: number;

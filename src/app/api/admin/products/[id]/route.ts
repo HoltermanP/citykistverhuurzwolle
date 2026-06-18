@@ -19,6 +19,7 @@ const updateSchema = z.object({
   volgorde: z.number().optional(),
   afbeeldingUrl: z.string().optional(),
   afbeeldingen: z.array(z.string()).optional(),
+  videoUrl: z.string().optional(),
 });
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
