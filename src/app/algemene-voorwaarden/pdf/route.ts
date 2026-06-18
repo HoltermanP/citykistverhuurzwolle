@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from "pdf-lib";
-import { AV_META, AV_ARTIKELEN } from "@/lib/algemene-voorwaarden";
+import { AV_META, AV_ARTIKELEN, AV_PRIVACY } from "@/lib/algemene-voorwaarden";
 
 // Genereert de algemene voorwaarden als nette, gepagineerde A4-PDF.
 // Bron is src/lib/algemene-voorwaarden.ts — dezelfde inhoud als de webpagina.
@@ -38,13 +38,31 @@ export async function GET() {
     const woorden = veilig(tekst).split(/\s+/);
     const regels: string[] = [];
     let huidig = "";
-    for (const w of woorden) {
-      const test = huidig ? `${huidig} ${w}` : w;
-      if (f.widthOfTextAtSize(test, size) > maxBreedte && huidig) {
-        regels.push(huidig);
-        huidig = w;
-      } else {
-        huidig = test;
+    // Breekt een te lang woord (bv. een URL zonder spaties) hard af op tekens.
+    const hakWoord = (w: string): string[] => {
+      if (f.widthOfTextAtSize(w, size) <= maxBreedte) return [w];
+      const stukken: string[] = [];
+      let stuk = "";
+      for (const ch of w) {
+        if (f.widthOfTextAtSize(stuk + ch, size) > maxBreedte && stuk) {
+          stukken.push(stuk);
+          stuk = ch;
+        } else {
+          stuk += ch;
+        }
+      }
+      if (stuk) stukken.push(stuk);
+      return stukken;
+    };
+    for (const woord of woorden) {
+      for (const w of hakWoord(woord)) {
+        const test = huidig ? `${huidig} ${w}` : w;
+        if (f.widthOfTextAtSize(test, size) > maxBreedte && huidig) {
+          regels.push(huidig);
+          huidig = w;
+        } else {
+          huidig = test;
+        }
       }
     }
     if (huidig) regels.push(huidig);
@@ -82,6 +100,7 @@ export async function GET() {
   schrijf(AV_META.bedrijf, M, BREEDTE, { size: 11, font: bold, color: DONKER });
   schrijf(AV_META.vestiging + ".", M, BREEDTE, { size: 10, color: GRIJS });
   schrijf(AV_META.kvk + ".", M, BREEDTE, { size: 10, color: GRIJS });
+  schrijf(AV_META.btw + ".", M, BREEDTE, { size: 10, color: GRIJS });
   schrijf(AV_META.versie, M, BREEDTE, { size: 9, color: GRIJS });
   y -= 6;
   ruimte(2);
@@ -129,6 +148,34 @@ export async function GET() {
       }
     }
     y -= 10;
+  }
+
+  // ── Privacyverklaring (AVG) ──
+  ruimte(60);
+  y -= 8;
+  page.drawLine({ start: { x: M, y }, end: { x: A4[0] - M, y }, thickness: 1, color: ACCENT });
+  y -= 24;
+  page.drawText(veilig(AV_PRIVACY.titel), { x: M, y: y - 16, size: 16, font: bold, color: ACCENT });
+  y -= 30;
+
+  for (const blok of AV_PRIVACY.blokken) {
+    if (blok.type === "kop") {
+      ruimte(24);
+      y -= 6;
+      schrijf(blok.tekst, M, BREEDTE, { size: 11, font: bold, color: DONKER });
+      y -= 2;
+    } else if (blok.type === "lijst") {
+      for (const item of blok.items) {
+        const inspring = 16;
+        ruimte(15);
+        page.drawText("•", { x: M + 4, y: y - 10, size: 10, font, color: ACCENT });
+        schrijf(item, M + inspring, BREEDTE - inspring, { size: 10, color: DONKER });
+        y -= 3;
+      }
+    } else {
+      schrijf(blok.tekst, M, BREEDTE, { size: 10, color: DONKER });
+      y -= 4;
+    }
   }
 
   // ── Voettekst met paginanummers op elke pagina ──

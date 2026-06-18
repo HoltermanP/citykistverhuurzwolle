@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Download, FileText } from "lucide-react";
-import { AV_META, AV_ARTIKELEN } from "@/lib/algemene-voorwaarden";
+import { AV_META, AV_ARTIKELEN, AV_PRIVACY } from "@/lib/algemene-voorwaarden";
 
 export const metadata: Metadata = {
   title: "Algemene Voorwaarden",
   description:
-    "De algemene voorwaarden van CityKist Beamerverhuur Zwolle. Lees ze online of download ze als PDF.",
+    "De algemene voorwaarden en privacyverklaring van Citykist. Lees ze online of download ze als PDF.",
   alternates: { canonical: "/algemene-voorwaarden" },
   openGraph: {
     title: "Algemene Voorwaarden — CityKist Verhuur Zwolle",
@@ -53,6 +53,7 @@ export default function AlgemeneVoorwaardenPage() {
             <p className="text-slate-900 font-semibold">{AV_META.bedrijf}</p>
             <p>{AV_META.vestiging}.</p>
             <p>{AV_META.kvk}.</p>
+            <p>{AV_META.btw}.</p>
             <p className="text-slate-400 text-xs pt-1">{AV_META.versie}</p>
           </div>
         </div>
@@ -131,6 +132,41 @@ export default function AlgemeneVoorwaardenPage() {
             </article>
           ))}
         </div>
+
+        {/* ── PRIVACYVERKLARING (AVG) ─────────────────────────────── */}
+        <section id="privacy" className="mt-16 pt-10 border-t border-dark-border scroll-mt-24">
+          <h2 className="text-slate-900 font-black text-2xl md:text-3xl mb-6">
+            <span className="text-transparent bg-clip-text bg-gradient-party">{AV_PRIVACY.titel}</span>
+          </h2>
+          <div className="space-y-3">
+            {AV_PRIVACY.blokken.map((blok, i) => {
+              if (blok.type === "kop") {
+                return (
+                  <h3 key={i} className="text-slate-900 font-bold text-lg pt-5">
+                    {blok.tekst}
+                  </h3>
+                );
+              }
+              if (blok.type === "lijst") {
+                return (
+                  <ul key={i} className="space-y-2 pl-1">
+                    {blok.items.map((item, j) => (
+                      <li key={j} className="flex gap-3 text-slate-600 leading-relaxed">
+                        <span className="text-party flex-shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-party" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              }
+              return (
+                <p key={i} className="text-slate-600 leading-relaxed">
+                  {blok.tekst}
+                </p>
+              );
+            })}
+          </div>
+        </section>
 
         {/* Download onderaan */}
         <div className="mt-12 pt-8 border-t border-dark-border text-center">
