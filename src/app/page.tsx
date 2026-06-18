@@ -90,7 +90,7 @@ export default async function HomePage() {
                 { getal: "7 dagen", label: "Per week bereikbaar" },
                 { getal: "10+ jaar", label: "Tevreden klanten" },
                 { getal: "100%", label: "Geteste apparatuur" },
-                { getal: "Zwolle e.o.", label: "Bezorging mogelijk" },
+                { getal: "Zwolle e.o.", label: "Ophalen in de regio" },
               ].map((s) => (
                 <div key={s.label}>
                   <div className="text-2xl font-black text-cyan-300 [text-shadow:0_1px_8px_rgba(0,0,0,0.4)]">{s.getal}</div>
@@ -204,8 +204,8 @@ export default async function HomePage() {
             {[
               { nr: "1", emoji: "🔍", titel: "Kies producten", tekst: "Browse ons uitgebreide assortiment en voeg gewenste artikelen toe aan je aanvraag." },
               { nr: "2", emoji: "📋", titel: "Dien aanvraag in", tekst: "Vul je gegevens en gewenste datums in. We nemen zo snel mogelijk contact op." },
-              { nr: "3", emoji: "✅", titel: "Bevestiging", tekst: "Wij bevestigen de beschikbaarheid en stemmen de ophaal- of leverdatum af." },
-              { nr: "4", emoji: "🎉", titel: "Geniet!", tekst: "Haal op of laat bezorgen. Betaling achteraf na gebruik." },
+              { nr: "3", emoji: "✅", titel: "Bevestiging", tekst: "Wij bevestigen de beschikbaarheid en stemmen de ophaaldatum af." },
+              { nr: "4", emoji: "🎉", titel: "Geniet!", tekst: "Haal je spullen op en geniet van je feest!" },
             ].map((stap) => (
               <div key={stap.nr} className="relative">
                 <div className="h-full bg-dark-card border border-dark-border rounded-2xl p-6 text-center hover:-translate-y-1 hover:shadow-xl hover:shadow-party/10 transition-all duration-300">
@@ -228,8 +228,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {[
               { emoji: "💰", titel: "Laagste prijs", tekst: "Goedkoopste verhuur in Zwolle en omgeving" },
-              { emoji: "🚗", titel: "Bezorging", tekst: "Bezorgen en ophalen in de regio Zwolle" },
-              { emoji: "✅", titel: "Getest", tekst: "Alle apparatuur wordt vóór levering getest" },
+              { emoji: "🛒", titel: "Eenvoudig regelen", tekst: "Snel online aanvragen en ophalen in Zwolle" },
+              { emoji: "✅", titel: "Getest", tekst: "Alle apparatuur wordt vóór gebruik getest" },
               { emoji: "📞", titel: "7 dagen bereikbaar", tekst: "Ook in het weekend altijd bereikbaar" },
             ].map((u) => (
               <div key={u.titel} className="bg-dark-card border border-dark-border rounded-2xl p-6 hover:border-party/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-party/10 transition-all duration-300">
@@ -287,7 +287,7 @@ export default async function HomePage() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-lime-300">onvergetelijk feest</span>?
           </h2>
           <p className="text-white/90 mt-5 text-lg [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">
-            Geen online betaling bij aanvraag. Betaling achteraf na bevestiging.
+            Reken eenvoudig af met iDEAL of contant bij het ophalen.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link href="/producten" className="bg-white text-party hover:bg-white/90 px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg">

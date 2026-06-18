@@ -76,7 +76,7 @@ export default function ContactPage() {
                 <div>
                   <p className="text-slate-500 text-xs uppercase tracking-wide">Locatie</p>
                   <p className="text-slate-900 font-semibold">Zwolle en omgeving</p>
-                  <p className="text-slate-500 text-xs mt-0.5">Bezorging & ophalen in de regio</p>
+                  <p className="text-slate-500 text-xs mt-0.5">Ophalen in de regio Zwolle</p>
                 </div>
               </div>
 
@@ -98,9 +98,8 @@ export default function ContactPage() {
             <h3 className="text-slate-900 font-bold mb-3">Ophalen & retourneren</h3>
             <div className="space-y-2 text-sm text-slate-600">
               <p>🚗 Ophalen op afgesproken locatie in Zwolle</p>
-              <p>📦 Bezorging mogelijk in de regio (meerkosten)</p>
-              <p>💳 Betaling achteraf na gebruik</p>
-              <p>✅ Apparatuur wordt getest voor levering</p>
+              <p>💳 Betaal vooraf met iDEAL of contant bij het ophalen</p>
+              <p>✅ Apparatuur wordt getest voor gebruik</p>
             </div>
           </div>
         </div>

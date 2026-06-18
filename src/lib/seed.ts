@@ -3,7 +3,7 @@ import { products } from "./schema";
 
 const seedProducts = [
   // ── BEAMERS & PROJECTIE ──────────────────────────────────────
-  { naam: "Beamer huren", slug: "beamer-huren", categorie: "beamer", prijsPerDag: "24.79", populair: false, beschrijving: "Standaard beamer voor presentaties en feesten in Zwolle en omgeving.", kenmerken: ["Incl. HDMI-kabel", "Eenvoudig in gebruik", "Ophalen of bezorgen"] },
+  { naam: "Beamer huren", slug: "beamer-huren", categorie: "beamer", prijsPerDag: "24.79", populair: false, beschrijving: "Standaard beamer voor presentaties en feesten in Zwolle en omgeving.", kenmerken: ["Incl. HDMI-kabel", "Eenvoudig in gebruik", "Ophalen in Zwolle"] },
   { naam: "Beamer set incl. scherm, tafel & speaker", slug: "beamer-set-compleet", categorie: "beamer", prijsPerDag: "60.00", populair: true, beschrijving: "Complete beamer set inclusief projectiescherm, projectietafel en speaker.", kenmerken: ["Beamer + scherm + tafel + speaker", "Direct klaar voor gebruik", "Perfect voor feesten & presentaties"] },
   { naam: "Beamer set incl. speaker & laptop", slug: "beamer-set-laptop", categorie: "beamer", prijsPerDag: "65.00", populair: false, beschrijving: "Alles-in-één beamer set inclusief laptop voor presentaties en evenementen.", kenmerken: ["Beamer + speaker + laptop", "Geen eigen laptop nodig", "Plug & play"] },
   { naam: "Beamer voor het weekend", slug: "beamer-weekend", categorie: "beamer", prijsPerDag: "45.00", populair: true, beschrijving: "Speciale weekendtarieven voor beamerverhuur. Ophalen vrijdag, retour maandag.", kenmerken: ["Weekend tarief", "Ophalen vrijdag", "Retour maandag"] },
