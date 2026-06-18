@@ -1,6 +1,6 @@
 import { createMollieClient, MollieClient, PaymentStatus } from "@mollie/api-client";
 import { db } from "./db";
-import { orders, Order } from "./schema";
+import { orders, verhuringen, Order } from "./schema";
 import { and, eq, ne } from "drizzle-orm";
 import { sendOrderEmail } from "./email";
 
@@ -63,6 +63,10 @@ export async function syncOrderPayment(order: Order): Promise<string> {
     }
   } else {
     await db.update(orders).set({ betaalstatus: nieuweStatus }).where(eq(orders.id, order.id));
+    // Mislukte/geannuleerde/verlopen betaling: verhuurperiodes weer vrijgeven.
+    if (nieuweStatus === "mislukt") {
+      await db.delete(verhuringen).where(eq(verhuringen.orderId, order.id));
+    }
   }
 
   return nieuweStatus;

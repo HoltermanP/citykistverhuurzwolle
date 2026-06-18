@@ -64,7 +64,26 @@ export type OrderItem = {
   aantal: number;
   dagen: number;
   subtotaal: number;
+  startDatum?: string;
+  eindDatum?: string;
 };
+
+// Geboekte verhuurperiodes per product. Bij het plaatsen van een bestelling
+// wordt voor elk verhuurartikel (geen koop) een verhuring vastgelegd; die
+// periode is dan niet meer beschikbaar. Wordt vrijgegeven bij verwijderen van
+// de bestelling of bij een mislukte iDEAL-betaling.
+export const verhuringen = pgTable("verhuringen", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull(),
+  productId: integer("product_id").notNull(),
+  productNaam: text("product_naam").default(""),
+  startDatum: text("start_datum").notNull(),
+  eindDatum: text("eind_datum").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Verhuring = typeof verhuringen.$inferSelect;
+export type NewVerhuring = typeof verhuringen.$inferInsert;
 
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;

@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { orders } from "@/lib/schema";
+import { orders, verhuringen } from "@/lib/schema";
 import { eq } from "drizzle-orm";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -34,6 +34,9 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
     if (!verwijderd) {
       return NextResponse.json({ error: "Bestelling niet gevonden" }, { status: 404 });
     }
+    // Bijbehorende verhuurperiodes vrijgeven zodat de producten weer
+    // beschikbaar zijn op die data.
+    await db.delete(verhuringen).where(eq(verhuringen.orderId, orderId));
     return NextResponse.json({ success: true, id: verwijderd.id });
   } catch (err) {
     console.error("[admin/orders DELETE] mislukt:", err);

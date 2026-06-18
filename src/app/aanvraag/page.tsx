@@ -46,6 +46,8 @@ export default function AanvraagPage() {
         aantal: item.aantal,
         dagen,
         subtotaal: item.totaalprijs,
+        startDatum: item.startDatum,
+        eindDatum: item.eindDatum,
       };
     });
 

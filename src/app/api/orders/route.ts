@@ -1,12 +1,13 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { orders, NewOrder } from "@/lib/schema";
+import { orders, NewOrder, products, verhuringen } from "@/lib/schema";
 import { sendOrderEmail } from "@/lib/email";
 import { getMollie } from "@/lib/payments";
 import { metBtw } from "@/lib/btw";
+import { isBeschikbaar, Periode } from "@/lib/beschikbaarheid";
 import { PaymentMethod } from "@mollie/api-client";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 const orderSchema = z.object({
@@ -27,6 +28,8 @@ const orderSchema = z.object({
     aantal: z.number(),
     dagen: z.number(),
     subtotaal: z.number(),
+    startDatum: z.string().optional(),
+    eindDatum: z.string().optional(),
   })),
   totaal: z.number(),
 });
@@ -54,6 +57,56 @@ export async function POST(req: Request) {
     const exclTotaal = data.items.reduce((s, i) => s + i.subtotaal, 0);
     const { incl: totaalIncl } = metBtw(exclTotaal);
 
+    // ── Beschikbaarheid van verhuurproducten controleren ──
+    // Koopartikelen (isKoop) zijn niet aan een periode gebonden en worden
+    // overgeslagen. Voor verhuurartikelen mag de gevraagde periode niet
+    // overlappen met een al geboekte periode.
+    const productIds = [...new Set(data.items.map((i) => i.productId))];
+    const productRijen = productIds.length
+      ? await db
+          .select({ id: products.id, isKoop: products.isKoop })
+          .from(products)
+          .where(inArray(products.id, productIds))
+      : [];
+    const isKoopMap = new Map(productRijen.map((p) => [p.id, p.isKoop === true]));
+
+    const teBoeken = data.items
+      .filter((i) => !isKoopMap.get(i.productId)) // alleen verhuur
+      .map((i) => ({
+        productId: i.productId,
+        productNaam: i.productNaam,
+        periode: {
+          startDatum: i.startDatum || data.ophaaldatum,
+          eindDatum: i.eindDatum || data.retourdatum,
+        } as Periode,
+      }));
+
+    if (teBoeken.length > 0) {
+      const verhuurIds = [...new Set(teBoeken.map((i) => i.productId))];
+      const bestaande = await db
+        .select()
+        .from(verhuringen)
+        .where(inArray(verhuringen.productId, verhuurIds));
+      const perProduct = new Map<number, Periode[]>();
+      for (const v of bestaande) {
+        const lijst = perProduct.get(v.productId) || [];
+        lijst.push({ startDatum: v.startDatum, eindDatum: v.eindDatum });
+        perProduct.set(v.productId, lijst);
+      }
+      const conflicten = teBoeken.filter(
+        (i) => !isBeschikbaar(i.periode, perProduct.get(i.productId) || [])
+      );
+      if (conflicten.length > 0) {
+        const namen = [...new Set(conflicten.map((c) => c.productNaam))].join(", ");
+        return NextResponse.json(
+          {
+            error: `Helaas, ${namen} is op de gekozen datum(s) al verhuurd. Kies een andere periode of neem contact met ons op.`,
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     const newOrder: NewOrder = {
       naam: data.naam,
       email: data.email,
@@ -72,6 +125,20 @@ export async function POST(req: Request) {
     };
 
     const [order] = await db.insert(orders).values(newOrder).returning();
+
+    // Verhuurperiodes vastleggen zodat deze producten op die data niet
+    // opnieuw verhuurd kunnen worden.
+    if (teBoeken.length > 0) {
+      await db.insert(verhuringen).values(
+        teBoeken.map((i) => ({
+          orderId: order.id,
+          productId: i.productId,
+          productNaam: i.productNaam,
+          startDatum: i.periode.startDatum,
+          eindDatum: i.periode.eindDatum,
+        }))
+      );
+    }
 
     if (isIdeal) {
       // Maak een iDEAL-betaling aan bij Mollie en stuur de klant door naar de checkout.

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, FileText, PlayCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Product, Handleiding } from "@/lib/schema";
+import { isBeschikbaar, Periode } from "@/lib/beschikbaarheid";
 
 const CATEGORIE_EMOJI: Record<string, string> = {
   beamer: "📽️",
@@ -30,9 +31,10 @@ interface Props {
   product: Product;
   compact?: boolean;
   handleidingen?: Handleiding[];
+  geboekt?: Periode[];
 }
 
-export default function ProductCard({ product, compact = false, handleidingen = [] }: Props) {
+export default function ProductCard({ product, compact = false, handleidingen = [], geboekt = [] }: Props) {
   const { voegToe, openCart } = useCart();
   const [toegevoegd, setToeGevoegd] = useState(false);
   const [showKenmerken, setShowKenmerken] = useState(false);
@@ -48,7 +50,12 @@ export default function ProductCard({ product, compact = false, handleidingen = 
   ));
   const totaal = Number(product.prijsPerDag) * aantal * dagen;
 
+  // Koopartikelen zijn altijd beschikbaar; verhuurartikelen alleen als de
+  // gekozen periode niet overlapt met een al geboekte verhuring.
+  const beschikbaar = product.isKoop || isBeschikbaar({ startDatum, eindDatum }, geboekt);
+
   function handleToevoegen() {
+    if (!beschikbaar) return;
     voegToe(product, aantal, startDatum, eindDatum);
     setToeGevoegd(true);
     openCart();
@@ -239,6 +246,11 @@ export default function ProductCard({ product, compact = false, handleidingen = 
               <span className="text-slate-500 text-xs">Totaal ({dagen} dag{dagen !== 1 ? "en" : ""})</span>
               <span className="text-slate-900 font-bold">€{totaal.toFixed(2)}</span>
             </div>
+            {!beschikbaar && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5">
+                Al verhuurd op de gekozen datum(s). Kies een andere periode.
+              </p>
+            )}
           </div>
         )}
 
@@ -255,13 +267,16 @@ export default function ProductCard({ product, compact = false, handleidingen = 
 
           <button
             onClick={handleToevoegen}
+            disabled={!beschikbaar}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-sm ${
-              toegevoegd
-                ? "bg-green-600 text-white"
-                : "bg-gradient-party hover:opacity-90 text-white"
+              !beschikbaar
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                : toegevoegd
+                  ? "bg-green-600 text-white"
+                  : "bg-gradient-party hover:opacity-90 text-white"
             }`}
           >
-            {toegevoegd ? <>✓ Toegevoegd</> : <><Plus size={13} />Toevoegen</>}
+            {!beschikbaar ? "Verhuurd" : toegevoegd ? <>✓ Toegevoegd</> : <><Plus size={13} />Toevoegen</>}
           </button>
         </div>
       </div>
