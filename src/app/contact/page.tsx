@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
 
@@ -105,29 +105,9 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Contactformulier + FAQ */}
+        {/* Contactformulier */}
         <div className="space-y-4">
           <ContactForm />
-
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-6">
-            <h3 className="text-slate-900 font-bold mb-4 flex items-center gap-2">
-              <MessageSquare size={18} className="text-party" />
-              Veelgestelde vragen
-            </h3>
-            <div className="space-y-4">
-              {[
-                { v: "Wanneer moet ik betalen?", a: "Betaling vindt achteraf plaats na gebruik. Geen online betaling vereist bij de aanvraag." },
-                { v: "Bezorgen jullie ook?", a: "Ja, bezorging is mogelijk in de regio Zwolle. Neem contact op voor de kosten." },
-                { v: "Hoe ver van tevoren boeken?", a: "Zo snel mogelijk, zeker voor drukke periodes. Wij bevestigen de beschikbaarheid." },
-                { v: "Wat als iets kapot gaat?", a: "Neem direct contact op. We kijken samen naar een oplossing." },
-              ].map((faq, i) => (
-                <div key={i} className="border-b border-dark-border last:border-0 pb-3 last:pb-0">
-                  <p className="text-slate-900 text-sm font-semibold mb-1">{faq.v}</p>
-                  <p className="text-slate-600 text-sm">{faq.a}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
       </div>
