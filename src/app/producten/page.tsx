@@ -3,7 +3,7 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 import { products, handleidingen, Handleiding, verhuringen } from "@/lib/schema";
 import { eq, asc, isNotNull } from "drizzle-orm";
-import { Periode } from "@/lib/beschikbaarheid";
+import { GeboektePeriode } from "@/lib/beschikbaarheid";
 import ProductCard from "@/components/ProductCard";
 import ProductenFilter from "@/components/ProductenFilter";
 
@@ -69,11 +69,11 @@ export default async function ProductenPage({ searchParams }: PageProps) {
   }
 
   // Geboekte verhuurperiodes per product — om beschikbaarheid op de kaart te tonen.
-  const geboektPerProduct: Record<number, Periode[]> = {};
+  const geboektPerProduct: Record<number, GeboektePeriode[]> = {};
   try {
     const alle = await db.select().from(verhuringen);
     for (const v of alle) {
-      (geboektPerProduct[v.productId] ||= []).push({ startDatum: v.startDatum, eindDatum: v.eindDatum });
+      (geboektPerProduct[v.productId] ||= []).push({ startDatum: v.startDatum, eindDatum: v.eindDatum, aantal: v.aantal ?? 1 });
     }
   } catch {
     // geen verhuringen

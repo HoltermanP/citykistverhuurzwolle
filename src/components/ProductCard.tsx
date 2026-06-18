@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, FileText, PlayCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Product, Handleiding } from "@/lib/schema";
-import { isBeschikbaar, Periode } from "@/lib/beschikbaarheid";
+import { beschikbaarAantal, GeboektePeriode } from "@/lib/beschikbaarheid";
 
 const CATEGORIE_EMOJI: Record<string, string> = {
   beamer: "📽️",
@@ -31,7 +31,7 @@ interface Props {
   product: Product;
   compact?: boolean;
   handleidingen?: Handleiding[];
-  geboekt?: Periode[];
+  geboekt?: GeboektePeriode[];
 }
 
 export default function ProductCard({ product, compact = false, handleidingen = [], geboekt = [] }: Props) {
@@ -48,15 +48,21 @@ export default function ProductCard({ product, compact = false, handleidingen = 
   const dagen = Math.max(1, Math.ceil(
     (new Date(eindDatum).getTime() - new Date(startDatum).getTime()) / 86400000
   ));
-  const totaal = Number(product.prijsPerDag) * aantal * dagen;
-
-  // Koopartikelen zijn altijd beschikbaar; verhuurartikelen alleen als de
-  // gekozen periode niet overlapt met een al geboekte verhuring.
-  const beschikbaar = product.isKoop || isBeschikbaar({ startDatum, eindDatum }, geboekt);
+  // Koopartikelen kennen geen periode-beschikbaarheid. Voor verhuurartikelen
+  // is het resterende aantal = voorraad - reeds verhuurd in de gekozen periode.
+  const voorraad = product.voorraad ?? 1;
+  const nogBeschikbaar = product.isKoop
+    ? Infinity
+    : beschikbaarAantal({ startDatum, eindDatum }, voorraad, geboekt);
+  const beschikbaar = nogBeschikbaar > 0;
+  // Begrens het gekozen aantal op wat nog beschikbaar is (alleen verhuur).
+  const maxAantal = product.isKoop ? Infinity : nogBeschikbaar;
+  const effectiefAantal = Math.max(1, Math.min(aantal, maxAantal));
+  const totaal = Number(product.prijsPerDag) * effectiefAantal * dagen;
 
   function handleToevoegen() {
     if (!beschikbaar) return;
-    voegToe(product, aantal, startDatum, eindDatum);
+    voegToe(product, Math.max(1, effectiefAantal), startDatum, eindDatum);
     setToeGevoegd(true);
     openCart();
     setTimeout(() => setToeGevoegd(false), 2500);
@@ -237,19 +243,30 @@ export default function ProductCard({ product, compact = false, handleidingen = 
             <div className="flex items-center justify-between">
               <span className="text-slate-500 text-xs">Aantal</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => setAantal(Math.max(1, aantal - 1))} className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm flex items-center justify-center">−</button>
-                <span className="text-slate-900 font-semibold w-5 text-center text-sm">{aantal}</span>
-                <button onClick={() => setAantal(aantal + 1)} className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm flex items-center justify-center">+</button>
+                <button onClick={() => setAantal(Math.max(1, effectiefAantal - 1))} className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm flex items-center justify-center">−</button>
+                <span className="text-slate-900 font-semibold w-5 text-center text-sm">{effectiefAantal}</span>
+                <button
+                  onClick={() => setAantal(Math.min(maxAantal, effectiefAantal + 1))}
+                  disabled={effectiefAantal >= maxAantal}
+                  className="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 text-sm flex items-center justify-center"
+                >+</button>
               </div>
             </div>
             <div className="flex items-center justify-between pt-1 border-t border-dark-border">
               <span className="text-slate-500 text-xs">Totaal ({dagen} dag{dagen !== 1 ? "en" : ""})</span>
               <span className="text-slate-900 font-bold">€{totaal.toFixed(2)}</span>
             </div>
-            {!beschikbaar && (
+            {!beschikbaar ? (
               <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1.5">
                 Al verhuurd op de gekozen datum(s). Kies een andere periode.
               </p>
+            ) : (
+              voorraad > 1 &&
+              nogBeschikbaar < voorraad && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                  Nog {nogBeschikbaar} van {voorraad} beschikbaar op deze datum(s).
+                </p>
+              )
             )}
           </div>
         )}

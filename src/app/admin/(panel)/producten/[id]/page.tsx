@@ -33,6 +33,7 @@ export default async function BewerkProductPage({ params }: Props) {
           prijsPerDag: String(product.prijsPerDag),
           isKoop: product.isKoop ?? false,
           beschikbaar: product.beschikbaar ?? true,
+          voorraad: product.voorraad ?? 1,
           populair: product.populair ?? false,
           volgorde: product.volgorde ?? 0,
           videoUrl: product.videoUrl || "",

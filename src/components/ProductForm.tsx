@@ -15,6 +15,7 @@ interface ProductFormData {
   prijsPerDag: string;
   isKoop: boolean;
   beschikbaar: boolean;
+  voorraad: number;
   populair: boolean;
   volgorde: number;
   afbeeldingen: string[];
@@ -66,6 +67,7 @@ export default function ProductForm({ initieel, mode }: Props) {
     prijsPerDag: initieel?.prijsPerDag || "",
     isKoop: initieel?.isKoop || false,
     beschikbaar: initieel?.beschikbaar ?? true,
+    voorraad: initieel?.voorraad ?? 1,
     populair: initieel?.populair || false,
     volgorde: initieel?.volgorde || 0,
     afbeeldingen: initieel?.afbeeldingen || [],
@@ -240,6 +242,13 @@ export default function ProductForm({ initieel, mode }: Props) {
                 placeholder="https://youtube.com/..."
                 className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
               <p className="text-slate-400 text-xs mt-1">Link naar een video; wordt als &quot;Bekijk video&quot; bij het product getoond</p>
+            </div>
+
+            <div>
+              <label className="text-slate-600 text-sm block mb-1">Voorraad (aantal exemplaren)</label>
+              <input type="number" min={0} value={form.voorraad} onChange={(e) => updateForm("voorraad", Math.max(0, Number(e.target.value)))}
+                className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
+              <p className="text-slate-400 text-xs mt-1">Hoeveel je er hebt. Per verhuring wordt er 1 afgetrokken voor die periode; bij 0 beschikbaar is het &quot;verhuurd&quot;. Niet van toepassing op koopartikelen.</p>
             </div>
 
             <div>

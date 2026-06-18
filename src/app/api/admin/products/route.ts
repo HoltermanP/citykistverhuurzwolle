@@ -24,6 +24,7 @@ const productSchema = z.object({
   prijsPerDag: z.string(),
   isKoop: z.boolean().optional().default(false),
   beschikbaar: z.boolean().optional().default(true),
+  voorraad: z.number().int().min(0).optional().default(1),
   populair: z.boolean().optional().default(false),
   volgorde: z.number().optional().default(0),
   afbeeldingUrl: z.string().optional().default(""),

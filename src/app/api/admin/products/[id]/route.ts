@@ -15,6 +15,7 @@ const updateSchema = z.object({
   prijsPerDag: z.string().optional(),
   isKoop: z.boolean().optional(),
   beschikbaar: z.boolean().optional(),
+  voorraad: z.number().int().min(0).optional(),
   populair: z.boolean().optional(),
   volgorde: z.number().optional(),
   afbeeldingUrl: z.string().optional(),
