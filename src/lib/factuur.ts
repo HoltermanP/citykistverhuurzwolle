@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from "pdf-lib";
 import { Order, OrderItem } from "./schema";
-import { metBtw } from "./btw";
+import { bedragen } from "./btw";
 
 // Bedrijfsgegevens voor op de factuur. KvK, BTW-id, IBAN en adres zijn
 // (nog) niet in de codebase bekend — vul ze in via env-vars of pas ze
@@ -172,13 +172,24 @@ export async function genereerFactuurPdf(order: Order): Promise<Uint8Array> {
   page.drawLine({ start: { x: M, y: y + 8 }, end: { x: width - M, y: y + 8 }, thickness: 0.75, color: GRIJS });
 
   // ── Totalen (rechts) ──
-  const totalen = metBtw(items.reduce((s, i) => s + i.subtotaal, 0));
+  const totalen = bedragen(
+    items.reduce((s, i) => s + i.subtotaal, 0),
+    order.kortingPercentage || 0
+  );
   const labelX = width - M - 230;
   const bedragX = width - M - 8;
 
   y -= 6;
   tekst("Subtotaal (excl. BTW)", labelX, y, { size: 9, color: GRIJS });
   rechts(euro(totalen.excl), bedragX, y, { size: 9 });
+  if (totalen.korting > 0) {
+    y -= 16;
+    const label = order.kortingCode
+      ? `Korting ${order.kortingCode} (${totalen.kortingPercentage}%)`
+      : `Korting (${totalen.kortingPercentage}%)`;
+    tekst(label, labelX, y, { size: 9, color: GROEN });
+    rechts("- " + euro(totalen.korting), bedragX, y, { size: 9, color: GROEN });
+  }
   y -= 16;
   tekst("BTW 21%", labelX, y, { size: 9, color: GRIJS });
   rechts(euro(totalen.btw), bedragX, y, { size: 9 });

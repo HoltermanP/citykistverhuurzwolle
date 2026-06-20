@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useCart } from "@/context/CartContext";
-import { metBtw } from "@/lib/btw";
-import { CheckCircle, ShoppingCart, Trash2, ArrowLeft, Loader2, AlertCircle, Banknote, Wallet } from "lucide-react";
+import { bedragen } from "@/lib/btw";
+import { CheckCircle, ShoppingCart, Trash2, ArrowLeft, Loader2, AlertCircle, Banknote, Wallet, Tag, X } from "lucide-react";
 import Link from "next/link";
 
 function formatDate(dateStr: string) {
@@ -21,6 +21,41 @@ export default function AanvraagPage() {
   const [succes, setSucces] = useState(false);
   const [error, setError] = useState("");
   const [laden, setLaden] = useState(false);
+
+  // Kortingscode
+  const [codeInput, setCodeInput] = useState("");
+  const [korting, setKorting] = useState<{ code: string; percentage: number } | null>(null);
+  const [kortingError, setKortingError] = useState("");
+  const [kortingLaden, setKortingLaden] = useState(false);
+
+  const totalen = bedragen(totaalPrijs, korting?.percentage || 0);
+
+  async function pasCodeToe() {
+    const code = codeInput.trim();
+    if (!code) return;
+    setKortingLaden(true);
+    setKortingError("");
+    try {
+      const res = await fetch(`/api/kortingscode?code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if (data.geldig) {
+        setKorting({ code: data.code, percentage: data.percentage });
+        setCodeInput(data.code);
+      } else {
+        setKorting(null);
+        setKortingError(data.error || "Ongeldige kortingscode");
+      }
+    } catch {
+      setKortingError("Kon de code niet controleren. Probeer opnieuw.");
+    }
+    setKortingLaden(false);
+  }
+
+  function verwijderKorting() {
+    setKorting(null);
+    setCodeInput("");
+    setKortingError("");
+  }
 
   function updateForm(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -62,10 +97,11 @@ export default function AanvraagPage() {
         body: JSON.stringify({
           ...form,
           betaalmethode,
+          kortingCode: korting?.code || "",
           ophaaldatum: startDatums[0],
           retourdatum: eindDatums[eindDatums.length - 1],
           items,
-          totaal: metBtw(totaalPrijs).incl,
+          totaal: totalen.incl,
         }),
       });
 
@@ -318,20 +354,61 @@ export default function AanvraagPage() {
                   })}
                 </div>
 
-                <div className="border-t border-dark-border pt-4 space-y-1.5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">Subtotaal (excl. BTW)</span>
-                    <span className="text-slate-700">€{metBtw(totaalPrijs).excl.toFixed(2)}</span>
+                <div className="border-t border-dark-border pt-4">
+                  {/* Kortingscode */}
+                  {korting ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-3 py-2 mb-3">
+                      <span className="text-green-700 text-sm font-medium flex items-center gap-1.5">
+                        <Tag size={14} /> Code {korting.code} toegepast (−{korting.percentage}%)
+                      </span>
+                      <button type="button" onClick={verwijderKorting} className="text-green-700 hover:text-green-900">
+                        <X size={15} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mb-3">
+                      <div className="flex gap-2">
+                        <input
+                          value={codeInput}
+                          onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); pasCodeToe(); } }}
+                          placeholder="Kortingscode"
+                          className="flex-1 bg-dark border border-dark-border rounded-xl px-3 py-2 text-slate-900 text-sm font-mono uppercase placeholder:font-sans placeholder:normal-case placeholder:text-slate-400 focus:outline-none focus:border-party"
+                        />
+                        <button
+                          type="button"
+                          onClick={pasCodeToe}
+                          disabled={kortingLaden || !codeInput.trim()}
+                          className="bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors"
+                        >
+                          {kortingLaden ? <Loader2 size={15} className="animate-spin" /> : "Toepassen"}
+                        </button>
+                      </div>
+                      {kortingError && <p className="text-red-500 text-xs mt-1">{kortingError}</p>}
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">Subtotaal (excl. BTW)</span>
+                      <span className="text-slate-700">€{totalen.excl.toFixed(2)}</span>
+                    </div>
+                    {korting && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-green-700">Korting ({korting.percentage}%)</span>
+                        <span className="text-green-700">−€{totalen.korting.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-slate-600">BTW 21%</span>
+                      <span className="text-slate-700">€{totalen.btw.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-dark-border">
+                      <span className="text-slate-900 font-semibold">Totaal (incl. BTW)</span>
+                      <span className="text-slate-900 font-black text-2xl">€{totalen.incl.toFixed(2)}</span>
+                    </div>
+                    <p className="text-slate-400 text-xs pt-1">Definitief bedrag na bevestiging</p>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">BTW 21%</span>
-                    <span className="text-slate-700">€{metBtw(totaalPrijs).btw.toFixed(2)}</span>
-                  </div>
-                  <div className="flex items-center justify-between pt-2 border-t border-dark-border">
-                    <span className="text-slate-900 font-semibold">Totaal (incl. BTW)</span>
-                    <span className="text-slate-900 font-black text-2xl">€{metBtw(totaalPrijs).incl.toFixed(2)}</span>
-                  </div>
-                  <p className="text-slate-400 text-xs pt-1">Definitief bedrag na bevestiging</p>
                 </div>
               </>
             )}

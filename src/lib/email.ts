@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { Order, OrderItem, orders } from "./schema";
-import { metBtw } from "./btw";
+import { bedragen } from "./btw";
 import { genereerFactuurPdf, factuurnummerVoor } from "./factuur";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -52,7 +52,7 @@ function formatDate(dateStr: string) {
 function buildOrderHtml(order: Order): string {
   const items = (order.items as OrderItem[]) || [];
   // Opbouw incl. BTW reconstrueren uit de regelbedragen (die zijn excl. BTW).
-  const inclBtw = metBtw(items.reduce((s, i) => s + i.subtotaal, 0));
+  const inclBtw = bedragen(items.reduce((s, i) => s + i.subtotaal, 0), order.kortingPercentage || 0);
   const itemsHtml = items
     .map(
       (i) => `
@@ -106,6 +106,14 @@ function buildOrderHtml(order: Order): string {
               <td colspan="3" style="padding:8px 12px;text-align:right;color:#555">Subtotaal (excl. BTW):</td>
               <td style="padding:8px 12px;text-align:right;color:#555">€${inclBtw.excl.toFixed(2)}</td>
             </tr>
+            ${
+              inclBtw.korting > 0
+                ? `<tr>
+              <td colspan="3" style="padding:8px 12px;text-align:right;color:#067647">Korting ${order.kortingCode || ""} (${inclBtw.kortingPercentage}%):</td>
+              <td style="padding:8px 12px;text-align:right;color:#067647">−€${inclBtw.korting.toFixed(2)}</td>
+            </tr>`
+                : ""
+            }
             <tr>
               <td colspan="3" style="padding:8px 12px;text-align:right;color:#555">BTW 21%:</td>
               <td style="padding:8px 12px;text-align:right;color:#555">€${inclBtw.btw.toFixed(2)}</td>

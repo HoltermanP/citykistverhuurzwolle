@@ -59,6 +59,8 @@ export default async function BestellingenPage() {
         betaalstatus: orders.betaalstatus,
         molliePaymentId: orders.molliePaymentId,
         factuurnummer: orders.factuurnummer,
+        kortingCode: orders.kortingCode,
+        kortingPercentage: orders.kortingPercentage,
         totaal: orders.totaal,
         items: orders.items,
         createdAt: orders.createdAt,
@@ -111,6 +113,11 @@ export default async function BestellingenPage() {
                       return <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${b.cls}`}>{b.label}</span>;
                     })()}
                     <OrderStatusSelect id={order.id} status={order.status || "nieuw"} />
+                    {order.kortingCode && (
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                        {order.kortingCode} −{order.kortingPercentage}%
+                      </span>
+                    )}
                     <span className="text-party font-bold">€{Number(order.totaal).toFixed(2)} <span className="text-slate-400 font-normal text-xs">incl. BTW</span></span>
                     <a
                       href={`/api/admin/orders/${order.id}/factuur`}

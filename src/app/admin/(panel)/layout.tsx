@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LayoutDashboard, Package, ShoppingBag, ArrowLeft, FileText, CalendarDays } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, ArrowLeft, FileText, CalendarDays, Percent } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -35,6 +35,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link href="/admin/service" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-600 hover:text-party hover:bg-slate-100 text-sm transition-colors">
             <FileText size={16} />
             Service
+          </Link>
+          <Link href="/admin/kortingscodes" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-600 hover:text-party hover:bg-slate-100 text-sm transition-colors">
+            <Percent size={16} />
+            Kortingscodes
           </Link>
         </nav>
 

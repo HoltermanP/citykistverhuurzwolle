@@ -38,10 +38,23 @@ export const orders = pgTable("orders", {
   molliePaymentId: text("mollie_payment_id").default(""),
   factuurnummer: text("factuurnummer").default(""),
   factuurPdf: text("factuur_pdf").default(""),
+  kortingCode: text("korting_code").default(""),
+  kortingPercentage: integer("korting_percentage").default(0),
   totaal: numeric("totaal", { precision: 10, scale: 2 }),
   items: jsonb("items").$type<OrderItem[]>().default([]),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const kortingscodes = pgTable("kortingscodes", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  percentage: integer("percentage").notNull(),
+  actief: boolean("actief").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Kortingscode = typeof kortingscodes.$inferSelect;
+export type NewKortingscode = typeof kortingscodes.$inferInsert;
 
 export const handleidingen = pgTable("handleidingen", {
   id: serial("id").primaryKey(),

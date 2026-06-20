@@ -4,8 +4,9 @@ import { db } from "@/lib/db";
 import { orders, NewOrder, products, verhuringen } from "@/lib/schema";
 import { sendOrderEmail } from "@/lib/email";
 import { getMollie } from "@/lib/payments";
-import { metBtw } from "@/lib/btw";
+import { bedragen } from "@/lib/btw";
 import { beschikbaarAantal, Periode, GeboektePeriode } from "@/lib/beschikbaarheid";
+import { vindActieveKortingscode } from "@/lib/kortingen";
 import { PaymentMethod } from "@mollie/api-client";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -21,6 +22,7 @@ const orderSchema = z.object({
   retourdatum: z.string(),
   notities: z.string().optional().default(""),
   betaalmethode: z.enum(["ideal", "contant"]).default("contant"),
+  kortingCode: z.string().optional().default(""),
   items: z.array(z.object({
     productId: z.number(),
     productNaam: z.string(),
@@ -54,8 +56,11 @@ export async function POST(req: Request) {
 
     // Bedragen autoritatief op de server berekenen (niet de client vertrouwen):
     // productprijzen zijn excl. BTW, de klant betaalt incl. 21% BTW.
+    // Kortingscode server-side valideren en toepassen op het bedrag excl. BTW.
     const exclTotaal = data.items.reduce((s, i) => s + i.subtotaal, 0);
-    const { incl: totaalIncl } = metBtw(exclTotaal);
+    const korting = data.kortingCode ? await vindActieveKortingscode(data.kortingCode) : null;
+    const kortingPct = korting?.percentage || 0;
+    const { incl: totaalIncl } = bedragen(exclTotaal, kortingPct);
 
     // ── Beschikbaarheid van verhuurproducten controleren ──
     // Koopartikelen (isKoop) zijn niet aan een periode gebonden en worden
@@ -130,6 +135,8 @@ export async function POST(req: Request) {
       status: "nieuw",
       betaalmethode: data.betaalmethode,
       betaalstatus: isIdeal ? "open" : "n.v.t.",
+      kortingCode: korting?.code || "",
+      kortingPercentage: kortingPct,
     };
 
     const [order] = await db.insert(orders).values(newOrder).returning();

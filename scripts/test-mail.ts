@@ -19,6 +19,8 @@ async function main() {
     molliePaymentId: "",
     factuurnummer: "CK-TEST-9999",
     factuurPdf: "",
+    kortingCode: "",
+    kortingPercentage: 0,
     totaal: "12.10",
     items: [
       {
