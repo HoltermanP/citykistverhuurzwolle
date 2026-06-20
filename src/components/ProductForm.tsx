@@ -246,14 +246,14 @@ export default function ProductForm({ initieel, mode }: Props) {
 
             <div>
               <label className="text-slate-600 text-sm block mb-1">Voorraad (aantal exemplaren)</label>
-              <input type="number" min={0} value={form.voorraad} onChange={(e) => updateForm("voorraad", Math.max(0, Number(e.target.value)))}
+              <input type="number" min={0} value={form.voorraad === 0 ? "" : form.voorraad} onChange={(e) => updateForm("voorraad", e.target.value === "" ? 0 : Math.max(0, Number(e.target.value)))}
                 className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
               <p className="text-slate-400 text-xs mt-1">Hoeveel je er hebt. Per verhuring wordt er 1 afgetrokken voor die periode; bij 0 beschikbaar is het &quot;verhuurd&quot;. Niet van toepassing op koopartikelen.</p>
             </div>
 
             <div>
               <label className="text-slate-600 text-sm block mb-1">Volgorde</label>
-              <input type="number" value={form.volgorde} onChange={(e) => updateForm("volgorde", Number(e.target.value))}
+              <input type="number" value={form.volgorde === 0 ? "" : form.volgorde} onChange={(e) => updateForm("volgorde", e.target.value === "" ? 0 : Number(e.target.value))}
                 className="w-full bg-dark border border-dark-border rounded-xl px-4 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-party" />
             </div>
           </div>

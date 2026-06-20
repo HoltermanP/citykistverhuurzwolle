@@ -85,7 +85,7 @@ export default async function VerhuuragendaPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <div className="mb-8">
         <h1 className="text-slate-900 font-black text-2xl flex items-center gap-2">
           <CalendarDays size={22} className="text-party" /> Verhuuragenda

@@ -30,7 +30,7 @@ export default async function AdminProductenPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-slate-900 font-black text-2xl">Producten</h1>

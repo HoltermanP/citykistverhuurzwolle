@@ -15,7 +15,7 @@ export default async function BewerkProductPage({ params }: Props) {
   if (!product) notFound();
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <div className="mb-8">
         <h1 className="text-slate-900 font-black text-2xl">Product bewerken</h1>
         <p className="text-slate-500 text-sm mt-1">{product.naam}</p>

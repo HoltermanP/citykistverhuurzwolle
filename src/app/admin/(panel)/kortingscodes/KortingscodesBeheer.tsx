@@ -116,8 +116,8 @@ function Rij({
           type="number"
           min={1}
           max={100}
-          value={item.percentage}
-          onChange={(e) => onChange({ percentage: Number(e.target.value) })}
+          value={item.percentage === 0 ? "" : item.percentage}
+          onChange={(e) => onChange({ percentage: e.target.value === "" ? 0 : Number(e.target.value) })}
           className="w-full bg-dark border border-dark-border rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:border-party"
         />
       </div>

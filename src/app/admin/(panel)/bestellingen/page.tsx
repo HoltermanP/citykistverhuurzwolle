@@ -73,7 +73,7 @@ export default async function BestellingenPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-6 md:p-8">
       <div className="mb-8">
         <h1 className="text-slate-900 font-black text-2xl">Bestellingen</h1>
         <p className="text-slate-500 text-sm mt-1">{allOrders.length} totaal</p>
@@ -98,15 +98,15 @@ export default async function BestellingenPage() {
             return (
               <div key={order.id} className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-dark-border">
-                  <div className="flex items-center gap-4">
-                    <span className="text-slate-400 text-sm font-mono">#{order.id}</span>
-                    <div>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 sm:px-5 py-4 border-b border-dark-border">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-slate-400 text-sm font-mono flex-shrink-0">#{order.id}</span>
+                    <div className="min-w-0">
                       <span className="text-slate-900 font-semibold">{order.naam}</span>
-                      <span className="text-slate-500 text-sm ml-2">{order.email}</span>
+                      <span className="text-slate-500 text-sm ml-2 break-all">{order.email}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center flex-wrap gap-2 md:gap-3">
                     <span className="text-slate-500 text-xs">{formatDate(order.createdAt)}</span>
                     {(() => {
                       const b = betaalBadge(order);
