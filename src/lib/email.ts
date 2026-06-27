@@ -72,7 +72,7 @@ function buildOrderHtml(order: Order): string {
 
   return `
     <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px">
-      <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
+      <div style="background-color:#0891B2;background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
         <h1 style="color:white;margin:0;font-size:24px">🎉 Nieuwe Bestelling — CityKist Verhuur</h1>
       </div>
       <div style="background:white;padding:20px;border-radius:8px;margin-bottom:16px">
@@ -146,7 +146,7 @@ export async function sendOrderEmail(order: Order) {
   // meerdere seconden per mail).
   const klantHtml = `
       <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto">
-        <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
+        <div style="background-color:#0891B2;background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:24px">
           <h1 style="color:white;margin:0">Bedankt voor je aanvraag, ${order.naam}!</h1>
         </div>
         <p>We hebben je aanvraag ontvangen en nemen zo snel mogelijk contact met je op ter bevestiging.</p>
@@ -198,7 +198,7 @@ export async function sendContactEmail(data: ContactBericht) {
     replyTo: `"${data.naam}" <${data.email}>`,
     subject: `Contactformulier: bericht van ${data.naam}`,
     html: `<div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;padding:24px;border-radius:12px">
-      <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
+      <div style="background-color:#0891B2;background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
         <h1 style="color:white;margin:0;font-size:22px">📩 Nieuw bericht via contactformulier</h1>
       </div>
       <div style="background:white;padding:20px;border-radius:8px">
@@ -218,7 +218,7 @@ export async function sendContactEmail(data: ContactBericht) {
     to: data.email,
     subject: "Bedankt voor je bericht — CityKist Verhuur Zwolle",
     html: `<div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:0 auto">
-      <div style="background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
+      <div style="background-color:#0891B2;background:linear-gradient(135deg,#0891B2,#65A30D);padding:24px;border-radius:8px;margin-bottom:20px">
         <h1 style="color:white;margin:0">Bedankt voor je bericht, ${data.naam}!</h1>
       </div>
       <p>We hebben je bericht ontvangen en nemen zo snel mogelijk contact met je op.</p>
