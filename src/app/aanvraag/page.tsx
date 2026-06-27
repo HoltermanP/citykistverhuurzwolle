@@ -77,6 +77,7 @@ export default function AanvraagPage() {
       return {
         productId: item.product.id,
         productNaam: item.product.naam,
+        artikelnummer: item.product.artikelnummer ?? "",
         prijsPerDag: Number(item.product.prijsPerDag),
         aantal: item.aantal,
         dagen,

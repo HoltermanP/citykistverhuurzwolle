@@ -57,7 +57,11 @@ function buildOrderHtml(order: Order): string {
     .map(
       (i) => `
       <tr>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee">${i.productNaam}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eee">${i.productNaam}${
+          i.artikelnummer && i.artikelnummer.trim()
+            ? `<br><span style="color:#888;font-size:12px">Art.nr. ${i.artikelnummer.trim()}</span>`
+            : ""
+        }</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center">${i.aantal}x</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center">${i.dagen} dag(en)</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right">€${i.subtotaal.toFixed(2)}</td>

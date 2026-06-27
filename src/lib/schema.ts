@@ -74,6 +74,7 @@ export type NewHandleiding = typeof handleidingen.$inferInsert;
 export type OrderItem = {
   productId: number;
   productNaam: string;
+  artikelnummer?: string;
   prijsPerDag: number;
   aantal: number;
   dagen: number;

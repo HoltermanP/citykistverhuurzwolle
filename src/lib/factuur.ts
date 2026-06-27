@@ -148,8 +148,10 @@ export async function genereerFactuurPdf(order: Order): Promise<Uint8Array> {
   const items = (order.items as OrderItem[]) || [];
   let rij = 0;
   for (const it of items) {
+    const heeftArtnr = !!(it.artikelnummer && it.artikelnummer.trim());
+    const rowH = heeftArtnr ? 26 : 20;
     if (rij % 2 === 1) {
-      page.drawRectangle({ x: M, y: y - 6, width: width - 2 * M, height: 20, color: LICHTGRIJS });
+      page.drawRectangle({ x: M, y: y - (rowH - 14), width: width - 2 * M, height: rowH, color: LICHTGRIJS });
     }
     // Omschrijving evt. inkorten zodat het niet over de kolommen loopt.
     let naam = it.productNaam;
@@ -160,11 +162,14 @@ export async function genereerFactuurPdf(order: Order): Promise<Uint8Array> {
     if (naam !== it.productNaam) naam = naam.trimEnd() + "…";
 
     tekst(naam, colOmschrijving, y, { size: 9 });
+    if (heeftArtnr) {
+      tekst(`Art.nr. ${it.artikelnummer!.trim()}`, colOmschrijving, y - 10, { size: 7.5, color: GRIJS });
+    }
     rechts(`${it.aantal}`, colAantal + 30, y, { size: 9 });
     rechts(`${it.dagen}`, colDagen + 40, y, { size: 9 });
     rechts(euro(it.prijsPerDag), 478, y, { size: 9 });
     rechts(euro(it.subtotaal), colSubtotaal, y, { size: 9 });
-    y -= 20;
+    y -= rowH;
     rij++;
   }
 

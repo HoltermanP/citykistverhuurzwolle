@@ -26,6 +26,7 @@ const orderSchema = z.object({
   items: z.array(z.object({
     productId: z.number(),
     productNaam: z.string(),
+    artikelnummer: z.string().optional().default(""),
     prijsPerDag: z.number(),
     aantal: z.number(),
     dagen: z.number(),
